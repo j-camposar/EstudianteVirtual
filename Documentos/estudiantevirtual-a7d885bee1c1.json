@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "estudiantevirtual",
+  "private_key_id": "a7d885bee1c15b515757c74a80420a551d86e823",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCttoUkbGRFHgCm\nTv0yvr3jZ+ZbIReVJAUiGK8rwP5flYZoMQ83sxSb0h9QCDCYA8S1/SiQqteOU3fK\nyriFcZWcG5SnqPhgK/IozCMkAddzWUp3VJsDbzsNQPxP926sVMaF5Da7awYDz8XS\nvCcJ/qK1SKgbm/CiLuGzjUOWM4QXIsmwr6+JIZbXvNfrZEf3wpwsfGIBlDeWJpDO\nlGnqCV5CQTaXeDuaelBmiiGYJSzYfPD/4+AHCfR1evF8Kwy3pA7HozRvkIYOJRs3\nUj0gIdVCg42InQzf6rg2x2c6hJK6zLCwS1+7RYOq+2e1p+OFWA+EBWBNcRfE5RaG\njVenE1drAgMBAAECggEACjLykD5MImhUWDwmm4mDzP7Q3iRypc80/SWyRM34+vp+\nQLT/FFS17tjtMIRULg8SlPv/Gx22UcuB95/jw40oRoxMAKgBpTJCiBvfXrU8LBaS\n/uL/X7oMUocW1hV/iivg2AQB8ddvxZHrJttLKeGpNesri5HVSABoQGPleV0e8g8Z\n2yGuYt29/BmrDDRXo2h2xSCC/zs04T2cAmd0hqKbDrIL0a5miBgzYYvZ7QP5Mk3U\nE/WLYOLsmMA4/HZym0LqYxHIaf/VQ95tlWkie+wcMPTSuXi25ZXRm2DA9rYtmESt\nNY43hS66FySIQ0isP4caL6rHJ1RxMiTuaK3st4J1gQKBgQDTIcnzF4ToV604IVyU\npRgB+Zr8Z0oX34aux77Ll4/71FOqA/4/ScRxomAXaL0qKmVszz2DvkeqEdBXvxcF\nW92GLxhTx/p3LSQto2pq+DUfm9VwNByYAmA3z9G10lyBv39kLog+Kz44VOabIZej\nVivaFypWHyYjTpYug1IX2TyTQQKBgQDSoQZXjxO0AZgp4/b4u13u0GvyevddVOx4\nflWF9zKMgrEyiYI/eqtyQcKhtoMMTwRDanAI9USzPO4zZOUlYjHAqAUM7QdUlXiI\n8IlCkFbwhu4qbjT8OUsqAStLb7EWa7xIFkkUpGkeDN5SoADmVw4TXPT8VclDaMs6\n79JsI207qwKBgFulryP2cZrpdCeJU8ayY1l4H+6wZ1k1jiEQU6HMiJOn9yk10odm\nXf91nICM1pAXFy/ERc+KKVGJqgZszHFnDyHQD59Oj0psLeghp3AHjgfKfTvXYxIY\n9etEKqPiTIWFuqaiDEHwQ3HwaKmuS0R7g02IALihjMyGsGpAVsJDaigBAoGAGk8W\ntbUfZuqUERdyb9snfn72HNGTOEs1Rk+xawxXegmRDJj0de1ioODp6L0dXVo5VBpl\naBkKvcCsmCrQHH1JbaEPEHBC7CPHbINvAat50I1qDk65u4+Effirab7Hxd8rI231\nLujiYGiHFJb7xcm17mE8EJC+lPbv+6qdA/jg2gUCgYEAzO8bboiN7XDYgL0doQaZ\n9QGHvSZt5TSpJiSPSNnEOJnStoFVMCVpEVnMy3g7kLTgJSeqKuAR24dU9bBfNig/\nikG3ujYdw4Bgq7fyZrednMTj6PtqQI8NuFmE5R+U3u6TQR3Lw2Urdjo+hxs0VKNE\nRno0kYSlwbmKzfqG2qNyaoI=\n-----END PRIVATE KEY-----\n",
+  "client_email": "estudiante-virtual@estudiantevirtual.iam.gserviceaccount.com",
+  "client_id": "111081617008309743970",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/estudiante-virtual%40estudiantevirtual.iam.gserviceaccount.com"
+}

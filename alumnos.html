@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
+    <!-- Favicon -->
+    <link rel="icon" href="img/logo.png" type="image/png">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+    <!-- Icons -->
+    <link rel="stylesheet" href="lib/argon-dashboard-master/assets/vendor/nucleo/css/nucleo.css" type="text/css">
+    <link rel="stylesheet" href="lib/argon-dashboard-master/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+    <!-- Page plugins -->
+    <!-- Argon CSS -->
+
+    <link rel="stylesheet" href="lib/argon-dashboard-master/assets/css/argon.css?v=1.2.0" type="text/css">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" type="text/css">
+    <link href=" lib/bootstrap-fileinput-master/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+</head>
+<body style="background-image:none !important"> 
+    <div class="main-content" id="panel">
+        <div id="header"></div>
+        <div class="header pb-6">
+            <div class="container-fluid">
+                <div class="header-body">
+                    <div class="row align-items-center py-4">
+                        <div class="h2 text-white d-inline-block mb-0"  id="nombre"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <div class="container-fluid mt--6">
+            <div class="row ">
+                <div class="col-xl-6">
+                    <div class="table-responsive">
+                        <h1>Guias</h1>
+                        </br>
+                        <div class="table-responsive ">
+                            <table id="table_id" name ="table_id" style="width:400px;"class="tablas2 table-striped table-sm ">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: center;width:20%">Id</th>
+                                        <th style="text-align: center; width:60%">Nombre</th>
+                                        <th style="text-align: center;width:20%">Descargar</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6">
+                    <div class="table-responsive">
+                        <h1>Presentaciones y Videos</h1>
+                        </br>
+                        <table id="table_id2" name ="table_id2"   style="width:400px;"class="tablas2 table-striped  table-sm ">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center;width:20%">Id</th>
+                                    <th style="text-align: center; width:60%">Nombre</th>
+                                    <th style="text-align: center;width:20%">Descargar</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>
+<script src="lib/argon-dashboard-master/assets/vendor/jquery/dist/jquery.min.js"></script>
+  <script src="lib/argon-dashboard-master/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="lib/argon-dashboard-master/assets/vendor/js-cookie/js.cookie.js"></script>
+  <script src="lib/argon-dashboard-master/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
+  <script src="lib/argon-dashboard-master/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
+  <!-- Optional JS -->
+  <script src="lib/argon-dashboard-master/assets/vendor/chart.js/dist/Chart.min.js"></script>
+  <script src="lib/argon-dashboard-master/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+  <!-- Argon JS -->
+  <script src="lib/argon-dashboard-master/assets/js/argon.js?v=1.2.0"></script>
+  <script src="lib/argon-dashboard-master/assets/vendor/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="//cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="lib/datatables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="lib/datatables/js/dataTables.bootstrap.min.js"></script>
+<script src="lib/bootstrap-fileinput-master/js/fileinput.min.js" type="text/javascript"></script>
+<script src="lib/bootstrap-fileinput-master/js/locales/es.js" type="text/javascript"></script>	
+<script>
+  if(localStorage["perfil"]==null){
+        window.location.href="index.html";
+    }else{
+        perfil=localStorage["perfil"];
+        var AuxPerfil=JSON.parse(perfil);
+    }
+    var info;
+    console.log(AuxPerfil);
+    $.ajax({
+        url: 'https://api.estudiantevirtual.cl/upload/listarArchivo',
+        type: 'POST',
+        data: JSON.stringify({"seccion_id":AuxPerfil.seccion, "asignatura_id": AuxPerfil.asignatura}),
+        headers: {
+            "Content-Type":"application/json",
+            },
+        success: function(repos) {
+            console.log(repos);
+            info= repos;
+            var auxArchivos='[';
+            var auxppt='[';
+            for (var i =0; i<repos.length;i++){
+                var ext=repos[i].archivo.split(".");
+                if (ext[ext.length-1]=="pptx" || ext[ext.length-1]=="mp3" || ext[ext.length-1]=="mp4"){
+                    auxppt=auxppt+'{"id":"'+repos[i].id+'","nombre":"'+repos[i].archivo+'"},';
+                }
+                else{
+                    auxArchivos=auxArchivos+'{"id":"'+repos[i].id+'","nombre":"'+repos[i].archivo+'"},';
+                }
+            }
+            auxArchivos=auxArchivos.slice(0, -1);
+            auxArchivos=auxArchivos+']';
+            auxppt=auxppt.slice(0, -1);
+            auxppt=auxppt+']';
+            console.log(auxArchivos);
+            var table = $('#table_id').DataTable();
+            table.destroy();
+            $('#table_id').DataTable({
+                dom: 'Bfrtip',
+                "language": {
+                "url": "lib/datatables/language/Spanish.json"
+            },
+                    "data": JSON.parse(auxArchivos),
+                    "columns": [
+                        {
+                            "data": "id"
+                        }
+                        ,
+                        {
+                            "data": "nombre"
+                        }
+                        ,
+                            {"defaultContent": "<img id='descarga' name='descarga' style ='text-align:center;width:35px'src='img/descargar.png' ></i>"}
+                        ],
+                });
+                var table = $('#table_id2').DataTable();
+            table.destroy();
+            $('#table_id2').DataTable({
+                        dom: 'Bfrtip',
+                        "language": {
+                        "url": "lib/datatables/language/Spanish.json"
+                    },
+                    "data": JSON.parse(auxppt),
+                    "columns": [
+                        {
+                            "data": "id"
+                        }
+                        ,
+                        {
+                            "data": "nombre"
+                        }
+                        ,
+                            {"defaultContent": "<img id='descarga' name='descarga' style ='text-align:center;width:35px'src='img/descargar.png' ></i>"}
+                        ],
+                });
+        }
+    });
+    $(document).on('click', '#descarga', function (e) {
+        var valores = "";
+        $(this).parents("tr").find("td").each(function () {
+        valores += $(this).html() + "~";
+    });
+    console.log(valores);
+    var hola = valores.split("~");
+    for(var i = 0; i<info.length; i++)
+    {
+        if (info[i].id==hola[0]){
+            window.open("https://drive.google.com/u/0/uc?id="+info[i].ubicacion_archivo+"&export=download");
+        }
+    }
+});
+$("#nombre").html("<h1> Bienvenid@ " +AuxPerfil.nombre + " te encuentras en la asignatura: "+localStorage["asignatura"]+"</h1>");
+$(function () {
+    $("#header").load("head2.html");
+    $(".btn-get").hide();
+    setTimeout(() => {
+                $("#perfil").html(AuxPerfil.nombre);
+                }, 1000);
+});
+</script>
