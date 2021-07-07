@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+    
+    <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/font-awesome/css/fontawesome.css"/>
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <title>Hello World</title>
+</head>
+<body style="background-image:none !important">
+    <div id="header"></div>
+    <div class="app">
+        <nav class="navbar infobar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <span class="infobar-title">Prueba </span>
+                    <ul class="infobar-info">
+                        <li><a>Asignatura: <span name="name" id="name"></span></a></li>
+                        <li><a>Rut: <span name="rut" id="rut"></span></a></li>
+                    </ul>
+                </div>
+                <div class="">
+                   
+                </div>
+            </div>
+        </nav>
+<div class="container" id="test1" style="display: none " >
+    <div class="row">
+        <article style="margin-top: 5em;">
+            <div class="widget-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-12 col-md-3">
+                            <div class="vrtwiz" id="menu">
+                                
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-9">
+                            <div class="rightab">
+                                <div class="tab-content" id="tabla" name="tabla">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+<nav class="navbar navbar-inverse navbar-fixed-bottom nav-stats">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" >Tiempo Restante: <span id="timer"></span></a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="botonesnav col-sm-6"></div>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="next">
+                    <a class="btn btn-lg txt-color-darken" onclick="finalizar();">Enviar</a></li>
+        </ul>
+        </div><!-- /.navbar-collapse -->
+
+    </div><!-- /.container-fluid -->
+</nav>
+</div>
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/jS/all.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script type="text/javascript" src="js/system.js"></script>
+<script type="text/javascript">
+    //app.initialize();
+      var url='https://api.estudiantevirtual.cl';
+      //var url="http://api.dev.estudiantevirtual.cl";
+    var Preguntas;
+    var list;
+    if(localStorage["perfil"]==null || localStorage["time"]=="0:0" ||  localStorage["realizado"]=="true"){
+        Swal.fire(
+                title='¡No Disponible!',
+                html='No tiene permiso para ingresar a esta prueba',
+                type ='error'
+            ).then((result) => {
+                window.location.href="listaPruebas.html";
+            });
+        window.location.href="asignatura.html";
+    }else{
+        perfil=localStorage["perfil"];
+        var aux=JSON.parse(perfil);
+    }
+    console.log(aux);
+    $(function(){
+      $("#header").load("head2.html");
+      //console.log(JSON.parse(datos));
+      document.getElementById("name").innerHTML = aux.asignatura;
+      document.getElementById("rut").innerHTML =  aux.rut;
+    });
+    var hoy=new Date();
+    var mes =parseInt(hoy.getMonth())+1;
+    if (mes<10){
+        mes="0"+mes;
+    }
+var hora= hoy.getHours()+':'+hoy.getMinutes();
+$.ajax({
+    url: url+"/asignatura-pruebas/buscaDisp",
+    type: 'POST',
+    data:JSON.stringify({"prueba_id":localStorage["id_prueba"], "perfil_id":aux.id,"dia":hoy.getFullYear()+"-"+ mes+"-"+hoy.getDate()+" 00:00:00","hora":hora}),
+    headers: {
+        "Content-Type":"application/json",
+        },
+    success(resp){
+        if (resp!="error"){
+            $.ajax({
+                url: url+"/opciones/buscaOpTest",
+                type: 'POST',
+                data:JSON.stringify({"id_pruebas":localStorage["id_prueba"]}),
+                headers: {
+                    "Content-Type":"application/json",
+                    },
+                success(Preguntas){
+                    console.log(localStorage["id_prueba"]);
+                    if(localStorage["time"]==-1){
+                        localStorage["time"] = Preguntas[0].minprueba +":00";
+                    }
+                    localStorage["preguntas"]=JSON.stringify(Preguntas);
+                    var menu='<ul class="verticalwiz">';
+                    var todo="";
+                    list=random_list(Preguntas.length);
+                    //console.log(list);
+                    for(var i=1; i<Preguntas.length+1;i++){
+                        largo=i-1;                   
+                        var dis;
+                        if(Preguntas[list[largo]].imagen==""){
+                            dis="none";
+                        }else{
+                            dis="inline-block";
+                        }
+                        todo=todo+ ('<div class="tab-pane active" name="tab'+i+'" id="tab'+i+'" ><br><h3><strong>Pregunta '+i+' - </strong><span id="p'+i+'" data-q="0" >'+Preguntas[list[largo]].pregunta+'</span>&nbsp&nbsp&nbsp<img id="imagen'+i+'" src="./img/'+Preguntas[list[largo]].imagen+'" style="width:200px; display:'+dis+'"/> </h3><div class="form-actions"><div class="row"><div class="col-sm-12"><div class="frb-group"></li>');
+                        for(var x=0;x<Preguntas[list[largo]]["op"].length;x++){
+                            todo=todo+'<div class="frb frb-primary"><input type="radio" id="r'+i+'-'+x+'" name="r'+i+'" value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
+                        }
+                        var adelante=i+1;
+                        var atras=i-1
+                        if (i==1){
+                            //menu//
+                            menu=menu+'<li class="active" data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" class="active"> <span class="step">'+i+'</span> <span class="title"></span> </a>';   
+                            //fin menu//
+                            todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous disabled"><a href="" class="btn btn-lg btn-default disabled" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
+                        }else if(i==Preguntas.length){
+                            menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';   
+                            todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="finalizar();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Finalizar </a></li></ul> </div></div></div></div></div>';
+                        }else{
+                            menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';   
+                            todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
+                        }
+                    }
+                    menu = menu+'</ul>';
+                    $("#menu").html(menu);
+                    $("#tabla").html(todo);
+                    document.getElementById("test1").style.display="block";
+                    document.getElementById('timer').innerHTML =  localStorage["time"];
+                    startTimer();
+                }
+            });
+        }else{
+            Swal.fire(
+                title='¡Prueba ya realizada!',
+                html='No se puede contestar mas de una vez esta prueba',
+                type ='error'
+            ).then((result) => {
+                window.location.href="listaPruebas.html";
+            });
+        } 
+    }
+});
+
+function finalizar() {
+    var res=localStorage["realizado"];
+    if(res!="true"){
+        Swal.fire({
+            title: '¿Estás Seguro?',
+            text: "No podrás modificar tu prueba al hacer esto",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si, Finalizar',
+            cancelButtonText: 'Modificar'
+        }).then((result) => {
+            if (result.value) {
+                var Pregunta=localStorage["preguntas"];
+                var largo=JSON.parse(Pregunta);
+                var resps = {};
+                for (var i = 1; i <=largo.length ; i++) {
+                    var respx = 0;
+                    var larg=i-1
+                    $('input[name="r'+i+'"]:checked').each(function () {
+                        resps["id_p" + i] =largo[list[larg]].preguntas_id;
+                        resps["resp" + i] = this.value;
+                        if(largo[list[larg]].correcta==resps["resp"+i]){
+                            resps["validacion"+i]=1;
+                        }else{
+                            resps["validacion"+i]=0;
+                        }
+                        respx = 1;
+                    });
+                    if (respx==0) {
+                        resps["id_p" + i] =largo[list[larg]].preguntas_id;
+                        resps["resp" + i] = "x";
+                        resps["validacion"+i]=0;
+                    }
+                }
+                //console.log(largo);
+                var nota=0;
+                for(var i=1;i<= largo.length;i++){
+                    nota = nota+resps["validacion"+i];
+                }
+                // console.log(largo[0].pruebas.exigencia);
+                nota=not(nota,largo.length,largo[0].exigencia);
+                console.log(nota);
+                $.ajax({
+                    url: url+"/respuestas/guardaNota",
+                    type: 'POST',
+                    data:JSON.stringify({"asignatura_pruebas_id":localStorage["asignatura_pruebas_id"],"perfil_id":aux.id, "nota":nota}),
+                    headers: {
+                        "Content-Type":"application/json",
+                        },
+                    beforeSend: function(){
+                        Swal.fire({
+                            title: 'Enviando Datos',
+                            html: 'Por favor espere.',
+                            timer: 10000,
+                            timerProgressBar: true,
+                            didOpen: () => {
+                                Swal.showLoading()
+                                timerInterval = setInterval(() => 100)
+                            }
+                        })
+                    },
+                    success(Preguntas){
+                    //console.log(response);
+                        if(Preguntas=="ok"){
+                            Swal.fire(
+                                    title='¡Prueba Terminada!',
+                                    html='<h3>Su nota es: '+nota+'</h3>',
+                                    type ='success'
+                            ).then((result) => {
+                                localStorage["realizado"]="true";
+                                window.location.href="listaPruebas.html";
+                            });
+                        }else{
+                            Swal.fire(
+                                    title='¡Error!',
+                                    html='Saque una foto y enviela a su profesor (error 0001)',
+                                    type ='success'
+                            ).then((result) => {
+                                localStorage["realizado"]="true";
+                                window.location.href="listaPruebas.html";
+                            });
+                        }
+                    }
+                });
+            }else{
+                Swal.fire(
+                    title='¡Prueba Terminada!',
+                    html='<h3>Ya no puede corregir las respuestas </h3>',
+                    type ='success'
+                ).then((result) => {
+                    localStorage["realizado"]="true";
+                    window.location.href="listaPruebas.html";
+                })
+            }
+        });
+    }
+}
+function finalizaTiempo(){
+    Swal.fire({
+        title: 'Tiempo Terminado',
+        html: 'Enviando datos, por favor espere',
+        timer: 2000,
+        timerProgressBar: true,
+        onBeforeOpen: () => {
+            Swal.showLoading()
+            timerInterval = setInterval(() => { 100})
+        },
+        onClose: () => {
+            clearInterval(timerInterval)
+        }
+    }).then((result) => {
+               /* Read more about handling dismissals below */
+        if (result.dismiss === Swal.DismissReason.timer) {
+            //console.log('I was closed by the timer')
+        }
+    });
+    var Pregunta=localStorage["preguntas"];
+    var largo=JSON.parse(Pregunta);        
+    var resps = {};
+    console.log(list);
+    for (var i = 1; i <=largo.length ; i++) {
+        var respx = 0;
+        var larg=i-1
+        $('input[name="r'+i+'"]:checked').each(function () {
+            resps["id_p" + i] =largo[list[larg]].preguntas_id;
+            resps["resp" + i] = this.value;
+            if(largo[list[larg]].correcta==resps["resp"+i]){
+                resps["validacion"+i]=1;
+            }else{
+                resps["validacion"+i]=0;
+            }
+            respx = 1;
+        });
+        if (respx==0) {
+            resps["id_p" + i] =largo[larg].preguntas_id;
+            resps["resp" + i] = "x";
+            resps["validacion"+i]=0;
+        }
+    }
+    //console.log(resps);
+    var nota=0;
+    for(var i=1;i<= largo.length;i++){
+         nota = nota+resps["validacion"+i];
+    }
+    nota=not(nota,largo.length,largo[0].exigencia); 
+    console.log(nota);   
+    var settings = {
+        "url": "https://apiciencoas.azurewebsites.net/api/values/resultado",
+        //"url": "https://localhost:44331/api/values/resultado",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+            "Content-Type": ["application/json", "text/plain"]
+        },
+            "data": "{\"prueba\":\""+largo[0].id+"\",\"participante\":\""+aux.rut+"\", \"nota\":\""+nota+"\"}\n",
+        };
+        $.ajax(settings).done(function (response) {
+            //console.log(response);
+            if(response==true){
+                Swal.fire(
+                    title='¡Prueba Terminada!',
+                    html='<h3>Su nota es: '+nota+'</h3>',
+                    type ='success'
+                ).then((result) => {
+                    localStorage["realizado"]="true";
+                    window.location.href="listaPruebas.html";
+                });
+            }
+        });
+    }
+    function startTimer() {
+       
+        var presentTime = document.getElementById('timer').innerHTML;
+        var timeArray = presentTime.split(/[:]+/);
+        var m = timeArray[0];
+        var s = checkSecond((timeArray[1] - 1));
+        if (s == 59) { m = m - 1 }
+        //if(m<0){alert('timer completed')}
+
+        document.getElementById('timer').innerHTML =
+            m + ":" + s;
+            localStorage["time"]=m + ":" + s;
+        if (m == 0 && s == 0) {
+            finalizaTiempo();
+        }
+        setTimeout(startTimer, 1000);
+    }
+
+    function checkSecond(sec) {
+        if (sec < 10 && sec >= 0) { sec = "0" + sec }; // add zero in front of numbers < 10
+        if (sec < 0) { sec = "59" };
+        return sec;
+    }
+
+    function not(nota, total,exigencia){
+        console.log(nota,total,exigencia);
+        if (nota<(total*(exigencia/100))){
+            var nota2= 20*(nota/((exigencia/100)*total))+20;
+            console.log(nota2);
+            return Math.round(nota2);
+        }else{
+            nota2=30*((nota-((exigencia/100)*total))/(total*(1-(exigencia/100))))+40;
+            console.log(nota2);
+            return Math.round(nota2);
+        }
+    }
+    function random_list(largo){
+        var lis=[]; 
+        var cont =0;
+      //console.log(largo);
+       while (lis.length < largo){
+            var num=Math.floor(Math.random()*largo);
+            //console.log(lis.indexOf(num));
+            if (lis.indexOf(num)==-1){
+                lis[cont]=num;  
+                cont++;            
+            }
+        }
+        return lis;
+    }
+    $(document).bind( 'mobileinit', function(){
+                         $.mobile.loader.prototype.options.text = "loading";
+                         $.mobile.loader.prototype.options.textVisible = true;
+                         $.mobile.loader.prototype.options.theme = "p";
+                         $.mobile.loader.prototype.options.textonly = false;
+                         $.mobile.loader.prototype.options.html = "<span class='ui-bar ui-overlay-c ui-corner-all'><i class='fa fa-spinner fa-spin fa-5x' style='color:#000;'></i></span>";
+                         });
+                         
+
+</script>
+</body>
+
+</html>

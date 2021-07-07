@@ -1,0 +1,505 @@
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+    
+    <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/font-awesome/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/datatables/css/dataTables.bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <title>Pruebas</title>
+    <style type="text/css">
+
+        /* Button used to open the contact form - fixed at the bottom of the page */
+        .open-button {
+          background-color: #555;
+          color: white;
+          padding: 16px 20px;
+          border: none;
+          opacity: 0.8;
+          position: fixed;
+          width: 500px;
+        }
+        /* The popup form - hidden by default */
+        .form-popup {
+          display: none;
+          position: fixed;
+          bottom: 0;
+          margin:0 auto !important;
+          right:400px;
+         
+          z-index: 9;
+        }
+        /* Add styles to the form container */
+        .form-container {
+          max-width: 500px;
+          padding: 10px;
+          border: 5px solid #f1f1f1;
+          border-radius: 10px;
+          background-color: white;   
+        }
+        /* Full-width input fields */
+        .form-container input[type=text], .form-container input[type=password] {
+          width: 80%;
+          padding: 15px;
+          margin: 5px 0 10px 0;
+          border: none;
+          background: #f1f1f1;
+        }
+        /* When the inputs get focus, do something */
+        .form-container input[type=text]:focus, .form-container input[type=password]:focus {
+          background-color: #ddd;
+          outline: none;
+        }
+        /* Set a style for the submit/login button */
+        .form-container .btn {
+          background-color: #4CAF50;
+          color: white;
+          border: none;
+          cursor: pointer;
+          width: 100%;
+          margin-bottom:5px;
+          opacity: 0.8;
+        }
+        /* Add a red background color to the cancel button */
+        .form-container .cancel {
+          background-color: red;
+        }
+        /* Add some hover effects to buttons */
+        .form-container .btn:hover, .open-button:hover {
+          opacity: 1;
+        }
+        </style>
+</head>
+<body >
+ <div id="header"></div>
+    <div class="app">
+        <center>
+            <div id="formContentRepor" style="padding: 30px;" >
+                    <h1 for="guia">Pruebas Subidas</h1>
+                    <div style ='text-align:left'>
+                    <h4>Agregar Prueba</h4>
+                    <i class="fas fa-plus-circle" onclick='openForm()' style ='font-size:40px; margin-left:30px' ></i>
+                </div>
+                    <table id="table_id" name ="table_id" style="width:100%; padding: 30px; text-align: center" class="table table-striped table-bordered table-sm ">
+                        <thead>
+                            <tr>
+                                <th>Nombre Prueba</th>
+                                <th>Seccion</th>
+                                <th>Fecha Inicio</th>
+                                <th>Fecha Fin</th>
+                                <th>Hora Inicio</th>
+                                <th>Hora Fin</th>
+                                <th>Duracion</th>
+                                <th>Status</th>
+                                <th>Editar</th>
+                                <th>Ver Preguntas</th>
+                                <th>Eliminar</th>     
+                                <th>Duplicar</th>
+                                                           
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="form-popup" id="myForm">
+                        <form  class="form-container">
+                          <label for="Pregunta"><b>Nombre Prueba</b></label>
+                          <input type="text" placeholder="Nombre" style ="width:70%" name="prueba"  id="prueba" required>
+                           
+                         </br>
+                          <div id="sec"></div>
+                        </br>
+                       
+                          <label for="b"><b>Inicio de Prueba </b></label>
+                          <input type="date" class="textarea" style ="width:65%"  placeholder="Respuesta" name="ini" id="ini"  required>
+                        </br>
+                        <label for="Pregunta"><b>Hora de Inicio</b></label>
+                        <input type="number" placeholder="HH" class="textarea" min="0" max="23" onkeyup="this.value=letras(this.value)"style ="width:30%" name="HoraIni"  id="HoraIni" required>
+                        <label for="Pregunta"><b>:</b></label>                                                
+                        <input type="number" placeholder="MM" class="textarea"  min="0" max="60" onkeyup="this.value=letras(this.value)" style ="width:30%" name="MinIni"  id="MinIni" required>
+                      </br>
+                          <label for="c"><b>Fin de Prueba</b></label>
+                          <input type="date" class="textarea" style ="width:70%"  placeholder="Respuesta" name="fin" id="fin" required>
+                        </br>
+                        <label for="Pregunta"><b>Hora de Fin</b></label>
+                        <input type="number" placeholder="HH" class="textarea" min="0" max="23" style ="width:30%" onkeyup="this.value=letras(this.value)" name="HoraFin"  id="HoraFin" required>
+                        <label for="Pregunta"><b>:</b></label>                        
+                        <input type="number" placeholder="MM" class="textarea"min="0" max="60"  style ="width:30%"  onkeyup="this.value=letras(this.value)" name="MinFin"  id="MinFin" required>
+                      </br>
+                      <label for="Pregunta"><b>Duracion</b></label>
+                            <input type="text"   class="textarea" placeholder="00" onkeyup="this.value=letras2(this.value)" style ="width:25%" name="min"  id="duracion" required>
+                            <label for="exigencia"><b>Exigencia</b></label>                    
+                            <input type="text"   class="textarea" placeholder="00"  onkeyup="this.value=letras2(this.value)" style ="width:25%" name="min"  id="exigencia" required>
+                        </br>
+                          <button type="button" id ="subir" class="btn">Subir</button>
+                          <button type="button" class="btn cancel" onclick="closeForm()">Cancelar</button>
+                        </form>
+                    </div>
+                    <div class="form-popup" id="myForm2">
+                        <form  class="form-container">
+                                <label for="Pregunta"><b>Nombre Prueba</b></label>
+                                <input type="text" placeholder="Nombre" style ="width:100%" name="prueba2"  id="prueba2" required>
+                                 
+                         </br>
+                            <div id="seccion"></div>
+                        </br>            
+                          <button type="button" id ="dup" class="btn">Subir</button>
+                          <button type="button" class="btn cancel" onclick="closeForm2()">Cancelar</button>
+                        </form>
+                    </div>
+    </center>
+</div>
+
+</body>
+<script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
+<script type="text/javascript" src="lib/sweetalert2/dist/sweetalert2.all.min.js"></script>
+<script type="text/javascript" src="lib/datatables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="lib/datatables/js/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript">
+   $(function(){
+      $("#header").load("header.html");
+
+    });
+    if(localStorage["perfil"]==null){
+        window.location.href="index.html";
+    }else{
+        perfil=localStorage["perfil"];
+        var AuxPerfil=JSON.parse(perfil);
+    }
+   // console.log(AuxPerfil);
+    var pruebas;
+     $.ajax({
+        url: 'https://apiciencoas.azurewebsites.net/api/prueba/mostrarp/?id='+AuxPerfil.asignatura,
+        //url: 'https://localhost:44331/api/prueba/mostrarp/?id='+AuxPerfil.asignatura,
+        type: 'Get',
+        success: function(repos) {
+            pruebas=repos;
+            var text ="[";
+            for (var i=0; i<repos.length;i++){
+                if (repos[i].status==1){
+                    var ini = repos[i].ini.split("T");
+                    var fin =repos[i].fin.split("T");
+                    text=text+'{"nombre":"'+repos[i].nombre+'","seccion":"'+repos[i].seccion.nombre+'","ini":"'+ini[0]+'","fin":"'+fin[0]+'","horaini":"'+repos[i].horaIni+'","horafin":"'+repos[i].horaFin+'","duracion":"'+repos[i].minPrueba+'","status":"'+repos[i].status+'"},';
+                }
+            }
+            var auxtext=text.slice(0, -1);
+            auxtext=auxtext+"]";
+            //console.log(JSON.parse(auxtext));
+            var table = $('#table_id').DataTable();
+            table.destroy();
+            $('#table_id').DataTable({
+                        dom: 'Bfrtip',
+                        "language": {
+                        "url": "lib/datatables/language/Spanish.json"
+                    },
+                    
+                    "data":JSON.parse(auxtext),
+                    "columns": [
+                        {
+                            "data": "nombre"
+                        }
+                        ,
+                        {
+                            "data": "seccion"
+                        }
+                        ,
+                        {
+                            "data": "ini"
+                        }
+                        ,
+                        {
+                            "data": "fin"
+                        },
+                        {
+                            "data": "horaini"
+                        },
+                        
+                        {
+                            "data": "horafin"
+                        },
+                        
+                        {
+                            "data": "duracion"
+                        }
+                        ,
+                        {
+                            "data": "status"
+                        }
+                        ,
+                            {"defaultContent": "<i id='editar'  onclick='openForm()' name='editar' class='fas fa-pencil-alt' style ='text-align:center;font-size:40px' ></i>"}
+                        ,
+                            {"defaultContent": "<i id='ver' name='ver' class='fas fa-eye' style ='text-align:center;font-size:40px' ></i>"}
+                        ,
+                            {"defaultContent": "<i id='borrar' class='fas fa-trash-alt fa-3x' name='borrar' style ='text-align:center; font-size:40px'></i>"}
+                        
+                        ,
+                            {"defaultContent": " <i class='fas fa-plus-circle' id='duplicar'  onclick='openForm2()' style ='font-size:40px;' ></i>"}
+                        ],
+                });
+        }
+     });
+     $(document).on('click', '#ver', function (e) {
+        var valores = "";
+        $(this).parents("tr").find("td").each(function () {
+            valores += $(this).html() + "~";
+    });
+    
+    var aux=valores.split("~");
+    for(var i =0;i<pruebas.length;i++){
+        if(aux[0]==pruebas[i].nombre){
+            localStorage["id_prueba"]=pruebas[i].id;
+            localStorage["pru"]=aux[0];
+            localStorage["nivel"]=aux[1];
+            window.location.href="opciones.html";
+        }
+    }
+    
+});
+$(document).on('click', '#borrar', function (e) {
+    Swal.fire({
+        title: 'Enviando datos',
+        html: 'Por favor espere.',
+        timer: 10000,
+        timerProgressBar: true,
+        onBeforeOpen: () => {
+            Swal.showLoading()
+            timerInterval = setInterval(() => { 100})
+        },
+        onClose: () => {
+            clearInterval(timerInterval)
+        }
+    });
+    var valores = "";
+        $(this).parents("tr").find("td").each(function () {
+            valores += $(this).html() + "~";
+    });
+    var aux=valores.split("~");
+    //console.log(aux);
+    //console.log(pruebas);
+    for(var i =0;i<pruebas.length;i++){
+        if(aux[0]==pruebas[i].nombre){
+            console.log(pruebas[i].id);
+            eliminado(pruebas[i].id);
+            break;
+        }
+    }
+})
+function openForm() {
+        document.getElementById("myForm").style.display = "block";
+        var b = localStorage["seccion"];
+        a=JSON.parse(b);
+        var text='<select id="seccion" style="width:45%">';
+       
+            text=text+'<option value="'+a.id+'">'+a.nombre+'</option>';
+      
+        text=text+'</select>';
+        document.getElementById("sec").innerHTML=text;
+        console.log(a);
+    }
+function closeForm() {
+    document.getElementById("prueba").value="";
+    document.getElementById("myForm").style.display = "none";
+}
+/* formulario de duplicado*/
+$(document).on('click', '#duplicar', function (e) {
+    document.getElementById("myForm2").style.display = "block";
+    var valores = "";
+    $(this).parents("tr").find("td").each(function () {
+        valores += $(this).html() + "~";
+    });
+
+    var aux=valores.split("~");
+   
+    document.getElementById("prueba2").value= aux[0];
+    
+    var b = localStorage["as"];
+    b= b.slice(0,-1);
+    b=b+"]";
+    a=JSON.parse(b);
+    var text='<select id="secci" style="width:100%">';
+    for(var i =0; i<a.length;i++){
+        text=text+'<option value="'+a[i].id+'">'+a[i].nombre+'</option>';
+    }
+    text=text+'</select>';
+    document.getElementById("seccion").innerHTML=text;
+    console.log(a);
+});
+function closeForm2() {
+    document.getElementById("myForm2").style.display = "none";
+}
+$(document).on('click', '#dup', function (e) {
+    var b = localStorage["seccion"];
+        a=JSON.parse(b);
+        for(var i =0;i<pruebas.length;i++){
+        if(document.getElementById("prueba2").value==pruebas[i].nombre){
+             var id=pruebas[i].id;
+        }
+    }
+        console.log('{"pruebas":"'+id+'","asignatura":"'+document.getElementById("secci").value+'", "seccion":"'+a.id+'"}')
+    $.ajax({
+       url: 'https://apiciencoas.azurewebsites.net/api/prueba/duplicar',
+       // url: 'https://localhost:44331/api/prueba/duplicar',
+        type: 'POST',
+        data:   '{"pruebas":"'+id+'","asignatura":"'+document.getElementById("secci").value+'", "seccion":"'+a.id+'"}',
+        headers: {
+            "Content-Type": ["application/json", "text/plain"]
+        },
+        success: function(repos){
+            if (repos==true){
+            Swal.fire({
+                title: "Listo!",
+                text: "Prueba Duplicada Correctamente",
+                type: 'success',
+            }).then(function (result){
+                window.location.reload();
+            });
+            }else{
+                console.log(repos);
+            }
+        }
+    });
+});
+/*fin duplicado*/
+function eliminado(id){
+    $.ajax({
+       url: 'https://apiciencoas.azurewebsites.net/api/prueba/eliminarp',
+       // url: 'https://localhost:44331/api/prueba/eliminarp',
+        type: 'POST',
+        data:   '{"id":"'+id+'","asignatura":"'+AuxPerfil.asignatura+'"}',
+        headers: {
+            "Content-Type": ["application/json", "text/plain"]
+        },
+        success: function(repos){
+            Swal.fire({
+                title: "Listo!",
+                text: "Prueba Eliminada Correctamente",
+                type: 'success',
+            }).then(function (result){
+                window.location.reload();
+            })
+        }
+    });
+}
+$(document).on('click', '#subir', function (e) {
+    if(document.getElementById("prueba").value!="" && document.getElementById("ini").value!="" && document.getElementById("fin").value!="" && document.getElementById("MinFin").value!="" && document.getElementById("HoraFin").value!=""&& document.getElementById("HoraIni").value!="" && document.getElementById("MinIni").value!="" && document.getElementById("duracion").value!="" && document.getElementById("exigencia").value!="")
+    {
+    Swal.fire({
+        title: 'Enviando datos',
+        html: 'Por favor espere.',
+        timer: 10000,
+        timerProgressBar: true,
+        onBeforeOpen: () => {
+            Swal.showLoading()
+            timerInterval = setInterval(() => { 100})
+        },
+        onClose: () => {
+            clearInterval(timerInterval)
+        }
+    });
+    var sec= localStorage["seccion"];
+    var seccion = JSON.parse(sec);
+    if(num==-1){
+        id=0;
+    }else{
+        id=pruebas[num].id;
+    }
+    console.log(JSON.parse('{ "nombre":"'+document.getElementById("prueba").value+'","ini":"'+document.getElementById("ini").value+'","fin":"'+document.getElementById("fin").value+'", "asignatura":"'+AuxPerfil.asignatura+'","seccion":"'+seccion.id+'", "id_prueba":"'+id+'","horaFin":"'+ document.getElementById("HoraFin").value+":"+ document.getElementById("MinFin").value+'","horaIni":"'+document.getElementById("HoraIni").value +":"+document.getElementById("MinIni").value+'","minPrueba":"'+document.getElementById("duracion").value+'","exigencia":"'+document.getElementById("exigencia").value+'"}'));
+
+    $.ajax({
+        url: 'https://apiciencoas.azurewebsites.net/api/prueba/actualizarp',
+        //url: 'https://localhost:44331/api/prueba/actualizarp',
+        type: 'POST',
+        data: '{ "nombre":"'+document.getElementById("prueba").value+'","ini":"'+document.getElementById("ini").value+'","fin":"'+document.getElementById("fin").value+'", "asignatura":"'+AuxPerfil.asignatura+'","seccion":"'+seccion.id+'", "id_prueba":"'+id+'","horaFin":"'+ document.getElementById("HoraFin").value+":"+ document.getElementById("MinFin").value+'","horaIni":"'+document.getElementById("HoraIni").value +":"+document.getElementById("MinIni").value+'","minPrueba":"'+document.getElementById("duracion").value+'","exigencia":"'+document.getElementById("exigencia").value+'"}',
+        headers: {
+            "Content-Type": ["application/json", "text/plain"]
+        },
+        success: function(repos){
+            Swal.fire({
+                title: "Listo!",
+                text: "Prueba Guardada Correctamente",
+                type: 'success',
+            }).then(function (result){
+                window.location.reload();
+            })
+        }
+    });
+    }
+    else{
+        Swal.fire({
+                title: "Error!",
+                text: "Por favor rellene todos los campos",
+                type: 'error',
+        });
+    }
+});
+var num=-1;
+     $(document).on('click', '#editar', function (e) {
+        var valores = "";
+        $(this).parents("tr").find("td").each(function () {
+            valores += $(this).html() + "~";
+    });
+    var aux=valores.split("~");
+    num=-1;
+    for (var i=0; i<pruebas.length;i++){
+        if(pruebas[i].nombre==aux[0] && num ==-1 && pruebas[i].status==1){
+            num=i;
+        }
+    }
+    var auxini = pruebas[num].ini.split("T");
+    var ini=auxini[0].split("-");
+    //console.log(ini);
+    var auxfin =pruebas[num].fin.split("T");
+    var fin=auxfin[0].split("-");
+    document.getElementById("prueba").value=pruebas[num].nombre;
+    document.getElementById("ini").value=ini[0]+"-"+ini[1]+"-"+ini[2];
+    document.getElementById("fin").value=fin[0]+"-"+fin[1]+"-"+fin[2];
+    document.getElementById("seccion").value=pruebas[num].seccion.id;
+    var Horafin=pruebas[num].horaFin.split(":");
+    document.getElementById("MinFin").value =Horafin[1];
+    document.getElementById("HoraFin").value=Horafin[0];
+    var HoraIni=pruebas[num].horaIni.split(":");
+    document.getElementById("HoraIni").value=HoraIni[0];
+    document.getElementById("MinIni").value=HoraIni[1];
+    document.getElementById("duracion").value=pruebas[num].minPrueba;
+    document.getElementById("exigencia").value=pruebas[num].exigencia;
+    
+});
+function letras(string){//Solo numeros
+    var out = '';
+    var filtro = '1234567890';//Caracteres validos
+    //Recorrer el texto y verificar si el caracter se encuentra en la lista de validos 
+    for (var i=0; i<string.length; i++)
+       if (filtro.indexOf(string.charAt(i) ) != -1 && i < 2) 
+             //Se añaden a la salida los caracteres validos
+	     out += string.charAt(i);
+    //Retornar valor filtrado
+    return out;
+} 
+function letras2(string){//Solo numeros
+    var out = '';
+    var filtro = '1234567890';//Caracteres validos
+    //Recorrer el texto y verificar si el caracter se encuentra en la lista de validos 
+    for (var i=0; i<string.length; i++)
+       if (filtro.indexOf(string.charAt(i) ) != -1 && i < 3) 
+             //Se añaden a la salida los caracteres validos
+	     out += string.charAt(i);
+    //Retornar valor filtrado
+    return out;
+} 
+
+</script>

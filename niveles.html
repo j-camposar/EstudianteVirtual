@@ -1,0 +1,61 @@
+
+<link rel="stylesheet" type="text/css" href="css/index.css" />
+
+<link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
+
+<link rel="stylesheet" type="text/css" href="lib/font-awesome/css/all.css" />
+
+<link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+
+<link rel="stylesheet" type="text/css" href="lib/datatables/css/dataTables.bootstrap.min.css" />
+<body>
+    <div id="header"></div>
+
+<div class="wrapper fadeInDown">
+    <div id="formContent">
+        
+    </div>
+</body>
+<script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script type="text/javascript" src="lib/datatables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="lib/datatables/dataTables.bootstrap.min.js"></script>
+<script>
+      var url='https://api.estudiantevirtual.cl';
+    //var url="http://api.dev.estudiantevirtual.cl";
+    $(function () {
+            $(".btn-get").hide();
+        });
+    if(localStorage["perfil"]==null){
+        window.location.href="index.html";
+    }else{
+        perfil=localStorage["perfil"];
+        var AuxPerfil=JSON.parse(perfil);
+    }
+    var text="</br>";
+    var response;
+$.ajax({
+    url:url+"/asignatura/listAsignatura",
+    type:"POST",
+    data: JSON.stringify({"perfil_id": AuxPerfil.id}),
+    headers: {
+        "Content-Type":"application/json",
+    },
+    success: function(respo){
+        response=respo;
+        console.log(response);
+        for (var i =0;i< response.length;i++){
+            text=text+'<button onclick="il(this.value)" style="background-image:url(\'./img/layout2.jpg\')"  class="textarea" value="'+i+'">'+response[i].nombre+'</button></br>';
+        }
+        $("#formContent").html(text);
+    }
+})
+function il(value){ 
+    var Aux=perfil.split(",");
+    var sec=Aux[3].split("}");
+    localStorage["perfil"]= Aux[0]+","+Aux[1]+","+Aux[2]+","+sec[0]+',"asignatura_id":"'+response[value].id+'","seccion_nom":"'+response[value].nombre+'","seccion_id":"'+response[value].seccion_id+'"}';
+    window.location.href="guias.html";
+}
+</script>

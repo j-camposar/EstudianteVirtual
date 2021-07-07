@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <title>Login</title>
+    </head>
+<body> 
+    <div class="wrapper fadeInDown">
+        <div id="formContent">
+                <!-- Tabs Titles -->
+                <!-- Icon -->
+                <div class="fadeIn first">
+                    <img src="img/logo.png" id="icon" style="width:200px;" />
+                </div>
+                <!-- Login Form -->
+                <input type="text"  id="user" name="user"  class="textarea" placeholder = "Usuario" />     
+                <input type="password" id="pass" name="pass"   class="textarea" placeholder = "Clave" />	
+                <input type="button"  style="text-align:center" onclick="ini()" class="fadeIn btn-send" value="Ingresar">
+                <!-- Remind Passowrd -->
+                <div id="formFooter">
+                    <a class="underlineHover" href="#" onclick="Info();">Ayuda?</a>
+                </div>
+            </div>
+        </div>
+<script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script type="text/javascript" src="lib/datatables/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="lib/datatables/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript">
+var url='https://api.estudiantevirtual.cl';
+//var url="http://api.dev.estudiantevirtual.cl";
+$('#user').on('input', function () { 
+    this.value = this.value.replace(/[^0-9K]/g,'');
+});
+function ini(){
+    $.ajax({
+        url: url+"/login/login",
+        type: 'POST',
+        data:JSON.stringify({"rut":$("#user").val(), "pass":$("#pass").val()}),
+        headers: {
+            "Content-Type":"application/json",
+            },
+        beforeSend: function(){
+            Swal.fire({
+                title: 'Iniciando sesion',
+                html: 'Por favor espere.',
+                timer: 10000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading()
+                    timerInterval = setInterval(() => 100)
+                }
+            })
+        },
+        success: function(response) {
+            if (response==null){
+                Swal.fire(
+                    "Permisos Erroneos",
+                    "Usuario y/o Contraseña son incorrectos",
+                    "warning"
+                )
+            }else{
+                var hoy=new Date();
+                var mes =parseInt(hoy.getMonth())+1;
+                var dia = hoy.getDate();
+                var ano = hoy.getFullYear();
+                var fech;
+                if (mes <10){
+                    fech=ano+"-0"+mes;
+                }else{
+                    fech=ano+"-"+mes;
+                }
+                if(dia<10){
+                    fech=fech+"-0"+dia +" 00:00:00";
+                }else{
+                    fech=fech+"-"+dia +" 00:00:00";
+                }
+                $.ajax({
+                    
+                   url: url+"/control/guarda",
+                    type: 'POST',
+                    data:JSON.stringify({"login_id":response.login_id, "fecha":fech}),
+                    headers: {
+                        "Content-Type":"application/json",
+                        },
+                    success: function(resp) {
+                        if(response.type==1 ){
+                            console.log(resp);
+                            localStorage["perfil"]='{"id":"'+response.perfil_id+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';
+                            window.location.href="niveles.html";
+                        }else if(response.type==0){
+                            localStorage["perfil"]='{"id":"'+response.perfil_id+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';                        
+                            window.location.href="asignatura.html";
+                        }else if(response.type==2){
+                            localStorage["perfil"]='{"id":"'+response.perfil_id+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';                        
+                            window.location.href="Control.html";
+                        }
+                    },error(error){
+                        Swal.fire(
+                        "Error",
+                        "Error en guardar control",
+                        "error"
+                        )
+                    }
+                });
+            }
+        },error(error){
+            Swal.fire(
+            "Permisos Erroneos",
+            "Usuario y/o Contraseña son incorrectos",
+            "warning"
+            )
+        }
+    });
+}
+    </script>
+</body>
+
+</html>
+

@@ -1,0 +1,88 @@
+
+ <link rel="stylesheet" type="text/css" href="css/index.css" />
+ <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
+ <link rel="stylesheet" type="text/css" href="lib/font-awesome/css/fontawesome.min.css" />
+ <link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+ <link rel="stylesheet" type="text/css" href="lib/datatables/css/dataTables.bootstrap.min.css" />
+ <div id="header"></div>
+</br>
+<div class="app">
+    <div class="wrapper fadeInDown">
+        <div id="formContent">
+       
+        </div>
+
+    </div>
+</div> 
+
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/jS/all.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script type="text/javascript" src="js/system.js"></script>
+<script type="text/javascript">
+     if(localStorage["perfil"]==null){
+        window.location.href="index.html";
+    }else{
+        perfil=localStorage["perfil"];
+        var Aux2=JSON.parse(perfil);
+        console.log(Aux2);
+        var AuxPerfil=JSON.parse('{"id":"'+Aux2.id+'","rut":"'+Aux2.rut+'","nombre":"'+Aux2.nombre+'","seccion":"'+Aux2.seccion+'"}');
+        console.log(AuxPerfil);
+    }
+    $(function(){
+      $("#header").load("header2.html");
+      //console.log(JSON.parse(datos));
+    });
+var text="</br>";
+$.ajax({
+    url:"https://api.estudiantevirtual.cl/asignatura/listaAsignaturaPorSeccion",
+    type:"POST",
+    data: JSON.stringify({"seccion_id": AuxPerfil.seccion}),
+    headers: {
+        "Content-Type":"application/json",
+    },
+    success: function(respo){
+        response=respo;
+        console.log(response);
+        for (var i =0;i< response.length;i++){
+            text=text+'<button onclick="il(this.value)" style="background-image:url(\'./img/layout2.jpg\')"  class="textarea" value="'+i+'">'+response[i].nombre+'</button></br>';
+        }
+        $("#formContent").html(text);
+    }
+})
+function il(value){ 
+            if (AuxPerfil.asignatura){
+                if (AuxPerfil.asignatura<10){
+                    var Aux=perfil.slice(0, -18);
+                    localStorage["perfil"]=  Aux+',"asignatura":"'+response[value].id+'"}';
+                    //console.log(localStorage["participante"]);                   
+                    localStorage["asignatura"]=response[value].nombre;
+                    localStorage["time"]=-1;
+                    localStorage["realizado"]="false";
+                    window.location.href="listaPruebas.html";
+
+                }else{
+                    var Aux=perfil.slice(0, -19);
+                    localStorage["perfil"]=  Aux+',"asignatura":"'+response[value].id+'"}';
+//                    console.log(localStorage["participante"]);
+                    localStorage["asignatura"]=response[value].nombre;
+                    localStorage["time"]=-1;
+                    localStorage["realizado"]="false";
+                    window.location.href="listaPruebas.html";
+                }
+            }else{
+                var Aux =perfil.slice(0, -1);
+                localStorage["perfil"]=  Aux+',"asignatura":"'+response[value].id+'"}';
+               // console.log(localStorage["participante"]);
+                localStorage["asignatura"]=response[value].nombre;
+                localStorage["time"]=-1;   
+                //console.log(localStorage["participante"]);       
+                localStorage["realizado"]="false";      
+                window.location.href="listaPruebas.html";
+            }
+        }
+
+</script>
