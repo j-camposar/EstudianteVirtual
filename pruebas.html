@@ -185,10 +185,20 @@
     var url='https://api.estudiantevirtual.cl';
     //var url="http://api.dev.estudiantevirtual.cl";
 $(function(){
-    $("#header").load("head.html");
-    setTimeout(() => {
-                $("#perfil").html(AuxPerfil.nombre);
-                }, 1000);
+    if(AuxPerfil.type==2){
+        $("#header").load("head3.html");
+        $(".btn-get").hide();
+        setTimeout(() => {
+            console.log(AuxPerfil);
+            $("#perfil").html(AuxPerfil.nombre);
+        }, 1000);
+    }else{
+        $("#header").load("head.html");
+        $(".btn-get").hide();
+        setTimeout(() => {
+            $("#perfil").html(AuxPerfil.nombre);
+        }, 1000);
+    }
 });
 if(localStorage["perfil"]==null){
     window.location.href="index.html";

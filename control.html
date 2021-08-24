@@ -10,8 +10,8 @@
 <div class="wrapper fadeInDown">
     <seccion>
         <div id="formContent">
-            <button onclick="il(1)" style="background-image:url('./img/layout2.jpg')"  class="textarea" >Gestion de Usuarios</button>
-            <button onclick="il(2)" style="background-image:url('./img/layout2.jpg')"  class="textarea" >Gestion de Cursos</button>
+            <button onclick="coordina(1)" style="background-image:url('./img/layout2.jpg')"  class="textarea" >Gestion de Usuarios</button>
+            <button onclick="coordina(2)" style="background-image:url('./img/layout2.jpg')"  class="textarea" >Gestion de Cursos</button>
             <div id="sec"></div>
         </div>
     </seccion>
@@ -21,6 +21,8 @@
 <script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
+    var url='https://api.estudiantevirtual.cl';
+//var url="http://api.dev.estudiantevirtual.cl";
     if(localStorage["perfil"]==null){
         window.location.href="index.html";
     }else{
@@ -28,15 +30,13 @@
         var AuxPerfil=JSON.parse(perfil);
     }
     var response;
-
 $(function () {
     $(".btn-get").hide();
-    
     console.log(AuxPerfil);
-        var text="</br>";
+    var text="";
     $.ajax({
-        //url:"https://api.estudiantevirtual.cl/asignatura/listAsignatura",
-        url:"http://api.dev.estudiantevirtual.cl/asignatura/listAsignatura",
+        url:url+"/asignatura/listAsignatura",
+        //url:"http://api.dev.estudiantevirtual.cl/asignatura/listAsignatura",
         type:"POST",
         data: JSON.stringify({"perfil_id": AuxPerfil.id}),
         headers: {
@@ -44,40 +44,33 @@ $(function () {
         },
         success: function(respo){
             response=respo;
-            console.log(response);
+            nombre="[";
             for (var i =0;i< response.length;i++){
-                con= i+3
-                text=text+'<button onclick="il(this.value)" style="background-image:url(\'./img/layout2.jpg\')"  class="textarea" value="'+con+'">'+response[i].nombre+'</button></br>';
+                text=text+'<button onclick="il(this.value)" style="background-image:url(\'./img/layout2.jpg\')"  class="textarea" value="'+i+'">'+response[i].nombre+'</button></br>';
+                nombre+='{"nombre":"'+response[i].nombre+'"},';                
             }
+            nom=nombre.slice(0,-1);
+            localStorage["seccion"]= nom+"]";
             $("#sec").html(text);
         }
     })
 });
-    function il(value){
-        if(value==1){
-            window.location.href="usuarios.html";
-        }else if(value==2){
-            window.location.href="cursos.html";
-        }else{
-            value=value-3;
-            if (AuxPerfil.asignatura){
-                if (AuxPerfil.seccion<10){
-                    var Aux=perfil.slice(0, -15);
-                    console.log(response);
-                    localStorage["perfil"]=  localStorage["perfil"]=Aux+',"asignatura":"'+response[value].id+'","seccion_id":"'+response[value].seccion_id+'","seccion_nom":"'+response[value].nombre+'"}';
-                    window.location.href="guias.html";
-                } else{
-                    var Aux=perfil.slice(0, -16);
-                    console.log(response);
-                    localStorage["perfil"]=  localStorage["perfil"]=Aux+',"asignatura":"'+response[value].id+'","seccion_id":"'+response[value].seccion_id+'","seccion_nom":"'+response[value].nombre+'"}';
-                    window.location.href="guias.html";
-                }
-            }else{
-                var Aux =perfil.slice(0, -1);
-                console.log(response);
-                localStorage["perfil"]=  localStorage["perfil"]=Aux+',"asignatura":"'+response[value].id+'","seccion_id":"'+response[value].seccion_id+'","seccion_nom":"'+response[value].nombre+'"}';
-                window.location.href="guias.html";
-            }
-        }
+function il(value){ 
+    var Aux=perfil.split(",");
+    var sec=Aux[3].split("}");
+    localStorage["perfil"]= Aux[0]+","+Aux[1]+","+Aux[2]+","+Aux[3]+","+Aux[4]+","+sec[0]+',"asignatura_id":"'+response[value].id+'","seccion_nom":"'+response[value].nombre+'","seccion_id":"'+response[value].seccion_id+'"}';
+    localStorage["seccion"]=Aux[2];
+    window.location.href="guias.html";
+}
+function coordina(val){
+    var Aux=perfil.split(",");
+    var sec=Aux[5].split("}");
+    if(val==1){
+        localStorage["perfil"]= Aux[0]+","+Aux[1]+","+Aux[2]+","+Aux[3]+","+Aux[4]+","+sec[0]+',"asignatura_id":"0","seccion_nom":"Gestion de Usuarios","seccion_id":"0"}';
+        window.location.href="usuarios.html";
+    }else{
+        localStorage["perfil"]= Aux[0]+","+Aux[1]+","+Aux[2]+","+Aux[3]+","+Aux[4]+","+sec[0]+',"asignatura_id":"0","seccion_nom":"Gestion de Niveles","seccion_id":"0"}';
+        window.location.href="guias.html";
     }
+}
 </script>

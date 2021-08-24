@@ -1,14 +1,13 @@
 <?php
   // get details of the uploaded file
   $fileTmpPath = $_FILES['file']['tmp_name'];
+  $rut=$_FILES['file']['name'];
 
-  $rut=$_GET['nombre'];
-  
   $fileName = $rut;
   // directory in which the uploaded file will be moved
-  $uploadFileDir = './Documentos/';
+  $uploadFileDir = './img/';
   $dest_path = $uploadFileDir .$fileName ;
-  
+
   if(move_uploaded_file($fileTmpPath, $dest_path))
   {
     $message =true;

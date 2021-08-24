@@ -182,7 +182,6 @@ $(document).on('click', '#borrar', function (e) {
             auxppt=auxppt+']';
             auxArchivos=auxArchivos.slice(0, -1);
             auxArchivos=auxArchivos+']';
-           
             $('#table_id').DataTable({
                         dom: 'Bfrtip',
                         "language": {
@@ -229,11 +228,20 @@ $(document).on('click', '#borrar', function (e) {
     });
         $("#nombre").html("<h1> Bienvenid@ " +AuxPerfil.nombre + " Te encuentras en el nivel: "+AuxPerfil.seccion_nom+"</h1>");
         $(function () {
+        if(AuxPerfil.type==2){
+            $("#header").load("head3.html");
+            $(".btn-get").hide();
+            setTimeout(() => {
+                console.log(AuxPerfil);
+                $("#perfil").html(AuxPerfil.nombre);
+            }, 1000);
+        }else{
             $("#header").load("head.html");
             $(".btn-get").hide();
             setTimeout(() => {
                 $("#perfil").html(AuxPerfil.nombre);
-                }, 1000);
+            }, 1000);
+        }
             
 
         });
