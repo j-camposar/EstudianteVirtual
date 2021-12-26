@@ -31,8 +31,8 @@
 <script type="text/javascript" src="lib/datatables/js/jquery.dataTables.js"></script>
 <script type="text/javascript" src="lib/datatables/dataTables.bootstrap.min.js"></script>
 <script type="text/javascript">
-var url='https://api.estudiantevirtual.cl';
-//var url="http://api.dev.estudiantevirtual.cl";
+ // var url='https://api.dev.estudiantevirtual.cl';
+        var url="http://localhost:8080/api_estudiantevirtual";
 $('#user').on('input', function () { 
     this.value = this.value.replace(/[^0-9K]/g,'');
 });
@@ -79,34 +79,33 @@ function ini(){
                 }else{
                     fech=fech+"-"+dia +" 00:00:00";
                 }
-                $.ajax({
+                // $.ajax({
                     
-                   url: url+"/control/guarda",
-                    type: 'POST',
-                    data:JSON.stringify({"login_id":response.login_id, "fecha":fech}),
-                    headers: {
-                        "Content-Type":"application/json",
-                        },
-                    success: function(resp) {
-                        if(response.type==1 ){
-                            console.log(resp);
-                            localStorage["perfil"]='{"id":"'+response.perfil_id+'","type":"'+response.type+'","id_institucion":"'+response.id_institucion+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';
-                            window.location.href="niveles.html";
-                        }else if(response.type==0){
-                            localStorage["perfil"]='{"id":"'+response.perfil_id+'","type":"'+response.type+'","id_institucion":"'+response.id_institucion+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';                        
-                            window.location.href="asignatura.html";
-                        }else if(response.type==2){
-                            localStorage["perfil"]='{"id":"'+response.perfil_id+'","type":"'+response.type+'","id_institucion":"'+response.id_institucion+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';                        
-                            window.location.href="Control.html";
-                        }
-                    },error(error){
-                        Swal.fire(
-                        "Error",
-                        "Error en guardar control",
-                        "error"
-                        )
-                    }
-                });
+                //    url: url+"/control/guarda",
+                //     type: 'POST',
+                //     data:JSON.stringify({"login_id":response.login_id, "fecha":fech}),
+                //     headers: {
+                //         "Content-Type":"application/json",
+                //         },
+                //     success: function(resp) {
+                if(response.type==1 ){
+                    localStorage["perfil"]='{"id":"'+response.perfil_id+'","type":"'+response.type+'","id_institucion":"'+response.id_institucion+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';
+                    window.location.href="niveles.html";
+                }else if(response.type==3){
+                    localStorage["perfil"]='{"id":"'+response.perfil_id+'","type":"'+response.type+'","id_institucion":"'+response.id_institucion+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';                        
+                    window.location.href="asignatura.html";
+                }else if(response.type==2){
+                    localStorage["perfil"]='{"id":"'+response.perfil_id+'","type":"'+response.type+'","id_institucion":"'+response.id_institucion+'","rut":"'+$("#user").val()+'","nombre":"'+response.nombre+'","type":"'+response.type+'","seccion":"'+response.seccion_id+'"}';                        
+                    window.location.href="control.html";
+                }
+                //     },error(error){
+                //         Swal.fire(
+                //         "Error",
+                //         "Error en guardar control",
+                //         "error"
+                //         )
+                //     }
+                // });
             }
         },error(error){
             Swal.fire(
