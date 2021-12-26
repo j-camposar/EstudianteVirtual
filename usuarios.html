@@ -84,30 +84,36 @@
         <div class="header pb-6">
             <div class="container-fluid">
                 <div class="header-body">
-            </br>
-            <h1 for="guia">Gestion de Estudiantes </h1>
-            </br>
-                    <div style ='text-align:left'>
-                        <h4>Agregar Estudiante</h4>
-                        <i class="fas fa-plus-circle" onclick='openForm()' style ='font-size:40px; margin-left:30px' ></i>
+                </br>
+                    <h1 for="guia">Gestion de Estudiantes </h1>
+                    </br>
+                    <div class="row">
+                        <div class= "col-md-6" style ='text-align:left;'>
+                            <h4>Agregar Estudiante</h4>
+                            <i class="fas fa-plus-circle" onclick='openForm()' style ='font-size:40px; margin-left:30px' ></i>
+                        </div>
+                        <div class= "col-md-6" style ='text-align:right;'>
+                            <h4>Carga Masiva de Estudiantes</h4>
+                            <i class="fas fa-upload" onclick='window.location.href="cargamasiva.html"' style ='font-size:40px; margin-right:80px'></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         </br>
         <div class="container-fluid mt--6">
-            <table id="table_id" name ="table_id" style="width:100%; padding: 30px; text-align: center" class="table table-striped table-bordered table-sm ">
+            <table id="table_id" name ="table_id" style="width:100%; padding: 30px; text-align: center" class="table table-striped table-bordered table-sm">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Nombre</th>
                         <th>Apellido</th>
                         <th>RUT</th>
                         <th>Telefono</th>
                         <th>Correo</th>
-                        <th>Seccion</th>
+                        <th>Nivel</th>
+                        <th>Estado</th>
                         <th>Editar</th>
-                        <th>Ver</th>
-                        <th>Eliminar</th>     
                     </tr>
                 </thead>
             </table>
@@ -116,19 +122,26 @@
 </div>
     <div class="form-popup" id="myForm">
         <form id="form" class="form-container">
+            <label for="b"><b>Rut </b></label>
+                <input type="text" class="textarea" style ="width:65%"  placeholder="123456789" name="rut" id="rut"  required>
+            </br>
             <label for="Pregunta"><b>Nombres</b></label>
             <input type="text" placeholder="Nombre" style ="width:70%" name="nombre"  id="nombre" required>
             </br>
+                 <label for="Pregunta"><b>Seleccione el nivel del estudiante</b></label>
                 <div id="sec"></div>
             </br>
                 <label for="b"><b>Apellidos </b></label>
                 <input type="text" class="textarea" style ="width:65%"  placeholder="Respuesta" name="apellido" id="apellido"  required>
             </br>
-                <label for="b"><b>Rut </b></label>
-                <input type="text" class="textarea" style ="width:65%"  placeholder="Respuesta" name="rut" id="rut"  required>
+                <label for="b"><b>estado </b></label>
+               <select id="estado" style="width:60%; border-radius:5px;">
+                   <option value=1>Activo</option>
+                   <option value=0>Inactivo</option>
+               </select>
             </br>
                 <label for="b"><b>Telefono </b></label>
-                <input type="text" class="textarea" style ="width:65%"  placeholder="Respuesta" name="telefono" id="telefono"  required>
+                <input type="text" class="textarea" style ="width:65%"  value=0 placeholder="Respuesta" name="telefono" id="telefono"  required>
             </br>
                 <label for="b"><b>Correo </b></label>
                 <input type="text" class="textarea" style ="width:65%"  placeholder="Respuesta" name="correo" id="correo"  required>
@@ -157,8 +170,8 @@
 <script src="lib/bootstrap-fileinput-master/js/fileinput.min.js" type="text/javascript"></script>
 <script src="lib/bootstrap-fileinput-master/js/locales/es.js" type="text/javascript"></script>	
 <script>
-    var url='https://api.estudiantevirtual.cl';
-//var url="http://api.dev.estudiantevirtual.cl";
+  //var url='https://api.dev.estudiantevirtual.cl';
+    var url="http://localhost:8080/api_estudiantevirtual";
 if(localStorage["perfil"]==null){
         window.location.href="index.html";
 }else{
@@ -174,14 +187,18 @@ $(function () {
             $("#perfil").html(AuxPerfil.nombre);
         }, 1000);
     }
+    ini();
 });
    // console.log(AuxPerfil);
-    var pruebas;
+   var pruebas;
+
+function ini(){
      $.ajax({
         url: url+"/Login/listEstudiantes/"+AuxPerfil.id_institucion,
         type: 'Get',
         success: function(repos){
-            //console.log(JSON.parse(auxtext));
+            pruebas=repos;
+            console.log(repos);
             var table = $('#table_id').DataTable();
             table.destroy(); 
             $('#table_id').DataTable({
@@ -191,6 +208,9 @@ $(function () {
                     },
                     "data":repos,
                     "columns": [
+                    {
+                            "data": "id"
+                        },
                         {
                             "data": "nombre"
                         }
@@ -211,86 +231,20 @@ $(function () {
                         },
                         
                         {
-                            "data": "seccion"
+                            "data": "seccion_nombre"
+                        }
+                        ,
+                        {
+                            "data": "estado"
                         }
                         ,
                             {"defaultContent": "<i id='editar'  onclick='openForm()' name='editar' class='fas fa-pencil-alt' style ='text-align:center;font-size:40px' ></i>"}
-                        ,
-                            {"defaultContent": "<i id='ver' name='ver' class='fas fa-eye' style ='text-align:center;font-size:40px' ></i>"}
-                        ,
-                            {"defaultContent": "<i id='borrar' class='fas fa-trash-alt fa-3x' name='borrar' style ='text-align:center; font-size:40px'></i>"}
                         ],
                 });
         }
      });
-     $(document).on('click', '#ver', function (e) {
-        var valores = "";
-        $(this).parents("tr").find("td").each(function () {
-            valores += $(this).html() + "~";
-    });
-    var aux=valores.split("~");
-    for(var i =0;i<pruebas.length;i++){
-        if(aux[0]==pruebas[i].nombre){
-            localStorage["id_prueba"]=pruebas[i].id;
-            localStorage["pru"]=aux[0];
-            localStorage["nivel"]=aux[1];
-            window.location.href="opciones.html";
-        }
     }
-});
-var num=-1;
-     $(document).on('click', '#editar', function (e) {
-        var valores = "";
-        $(this).parents("tr").find("td").each(function () {
-            valores += $(this).html() + "~";
-    });
-    var aux=valores.split("~");
-    num=-1;
-    for (var i=0; i<pruebas.length;i++){
-        if(pruebas[i].nombre==aux[0] && num ==-1 && pruebas[i].status==1){
-            num=i;
-        }
-    }
-    var auxini = pruebas[num].ini.split("T");
-    var ini=auxini[0].split("-");
-    //console.log(ini);
-    var auxfin =pruebas[num].fin.split("T");
-    var fin=auxfin[0].split("-");
-    document.getElementById("nombre").value=pruebas[num].nombre;
-    document.getElementById("apellido").value=pruebas[num].apellido;
-    document.getElementById("correo").value=pruebas[num].correo;
-    document.getElementById("telefono").value=pruebas[num].telefono;
-    document.getElementById("seccion").value=pruebas[num].seccion;
-});
-$(document).on('click', '#borrar', function (e) {
-    Swal.fire({
-        title: 'Enviando datos',
-        html: 'Por favor espere.',
-        timer: 10000,
-        timerProgressBar: true,
-        onBeforeOpen: () => {
-            Swal.showLoading()
-            timerInterval = setInterval(() => { 100})
-        },
-        onClose: () => {
-            clearInterval(timerInterval)
-        }
-    });
-    var valores = "";
-        $(this).parents("tr").find("td").each(function () {
-            valores += $(this).html() + "~";
-    });
-    var aux=valores.split("~");
-    //console.log(aux);
-    //console.log(pruebas);
-    for(var i =0;i<pruebas.length;i++){
-        if(aux[0]==pruebas[i].nombre){
-            console.log(pruebas[i].id);
-            eliminado(pruebas[i].id);
-            break;
-        }
-    }
-})
+
 function openForm() {
     $.ajax({
         url:url+"/asignatura/listSecciones",
@@ -312,20 +266,56 @@ function openForm() {
         }
     })
 }
+var num=-1;
+     $(document).on('click', '#editar', function (e) {
+        var valores = "";
+        $(this).parents("tr").find("td").each(function () {
+            valores += $(this).html() + "~";
+    });
+    var aux=valores.split("~");
+    num=-1;
+    for (var i=0; i<pruebas.length;i++){
+        if(pruebas[i].id==aux[0] && num ==-1 ){
+            num=i;
+            console.log(pruebas[num]);
+            document.getElementById("nombre").value=pruebas[num].nombre;
+            document.getElementById("apellido").value=pruebas[num].apellido;
+            document.getElementById("rut").value=pruebas[num].rut;
+            document.getElementById("correo").value=pruebas[num].correo;
+            document.getElementById("telefono").value=pruebas[num].telefono;
+          
+            $("#estado").val(pruebas[num].estado);
+            setTimeout(() => {
+            $("#seccion").val(pruebas[num].seccion);
+        }, 1000);
+        }
+    }
+});
+
 function closeForm() {
-    document.getElementById("prueba").value="";
+    document.getElementById("nombre").value="";
+            document.getElementById("apellido").value="";
+            document.getElementById("rut").value="";
+            document.getElementById("correo").value="";
+            document.getElementById("telefono").value="";
     document.getElementById("myForm").style.display = "none";
 }
+$('#rut').on('input', function () { 
+    this.value = this.value.replace(/[^0-9K]/g,'');
+});
 $("#subir").on("click", function(){
     if(valida()==true){
         json=[];
-        json["nombre"]=$("#nombre").val();
-        json["apellido"]=$("#apellido").val();
-        json["correo"]=$("#correo").val();
-        json["telefono"]=$("#telefono").val();
-        json["rut"]=$("#rut").val();
-        json["seccion"]=$("#seccion").val();
-        json["id_institucion"]=AuxPerfil.id_institucion;
+        json=JSON.stringify({
+            "nombre"  :$("#nombre").val(),
+            "apellido":$("#apellido").val(),
+            "correo"  :$("#correo").val(),
+            "telefono":$("#telefono").val(),
+            "rut"     :$("#rut").val(),
+            "seccion" :$("#seccion").val(),
+            "estado" :$("#estado").val(),
+            "id_institucion":AuxPerfil.id_institucion
+        });
        $.ajax({
             url:url+"/Login/saveEstudiantes",
             type:"POST",
@@ -334,7 +324,15 @@ $("#subir").on("click", function(){
                 "Content-Type":"application/json",
             },
             success: function(respo){
-                console.log(respo);
+                if(respo=="ok"){
+                    Swal.fire({
+                    title: "Listo!",
+                    text: "Datos Cargados Correctamente",
+                    type: 'success',
+                }).then(function (result){
+                    ini();
+                })
+                }
             }
        })
     }
@@ -345,12 +343,6 @@ function valida(){
         return false; 
     }if(document.getElementById("apellido").value==""){
         alert("Debe llenar el apellido");
-        return false; 
-    }if(document.getElementById("correo").value==""){
-        alert("Debe llenar el correo");
-        return false; 
-    }if(document.getElementById("telefono").value==""){
-        alert("Debe llenar el telefono");
         return false; 
     }if(document.getElementById("rut").value==""){
         alert("Debe llenar el rut");
