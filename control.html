@@ -1,4 +1,5 @@
 
+ <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 <link rel="stylesheet" type="text/css" href="css/index.css" />
 <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
 <link rel="stylesheet" type="text/css" href="lib/font-awesome/css/all.css" />
@@ -10,8 +11,9 @@
 <div class="wrapper fadeInDown">
     <seccion>
         <div id="formContent">
+            <div style='font-size:20px'>Seleccione la opción con la que trabajara</div></br>
             <button onclick="coordina(1)" style="background-image:url('./img/layout2.jpg')"  class="textarea" >Gestion de Usuarios</button>
-            <button onclick="coordina(2)" style="background-image:url('./img/layout2.jpg')"  class="textarea" >Gestion de Cursos</button>
+            <button onclick="coordina(2)" style="background-image:url('./img/layout2.jpg')"  class="textarea" >Gestion de Seccciones</button>
             <div id="sec"></div>
         </div>
     </seccion>
@@ -21,8 +23,8 @@
 <script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-    var url='https://api.estudiantevirtual.cl';
-//var url="http://api.dev.estudiantevirtual.cl";
+     var url='https://api.dev.estudiantevirtual.cl';
+    //var url="http://localhost:8080/api_estudiantevirtual";
     if(localStorage["perfil"]==null){
         window.location.href="index.html";
     }else{
@@ -35,7 +37,7 @@ $(function () {
     console.log(AuxPerfil);
     var text="";
     $.ajax({
-        url:url+"/asignatura/listAsignatura",
+        url:url+"/asignaturas/listAsignaturaEst",
         //url:"http://api.dev.estudiantevirtual.cl/asignatura/listAsignatura",
         type:"POST",
         data: JSON.stringify({"perfil_id": AuxPerfil.id}),
@@ -43,6 +45,7 @@ $(function () {
             "Content-Type":"application/json",
         },
         success: function(respo){
+            console.log(respo);
             response=respo;
             nombre="[";
             for (var i =0;i< response.length;i++){

@@ -7,6 +7,7 @@
 <div id="header"></div>
 <div class="app2">
     <div class="wrapper fadeInDown">
+
         <div id="formContent">
         </div>
     </div>
@@ -18,21 +19,23 @@
 <script type="text/javascript" src="lib/datatables/js/jquery.dataTables.js"></script>
 <script type="text/javascript" src="lib/datatables/dataTables.bootstrap.min.js"></script>
 <script>
-$(function () {
-    $(".btn-get").hide();
-});
-if(localStorage["perfil"]==null){
-    window.location.href="index.html";
-}else{
-    perfil=localStorage["perfil"];
-    var AuxPerfil=JSON.parse(perfil);
-}
-var text="</br>";
+       var url='https://api.dev.estudiantevirtual.cl';
+        //var url="http://localhost:8080/api_estudiantevirtual";
+    $(function () {
+            $(".btn-get").hide();
+        });
+    if(localStorage["perfil"]==null){
+        window.location.href="index.html";
+    }else{
+        perfil=localStorage["perfil"];
+        var AuxPerfil=JSON.parse(perfil);
+    }
+    var text="<div style='font-size:20px'>Seleccione la Seccion con la que trabajara</div></br>";
+    var response;
 $.ajax({
-    url:"https://api.estudiantevirtual.cl/asignatura/listaAsignaturaPorSeccion",
-    //url:"http://api.dev.estudiantevirtual.cl/asignatura/listaAsignaturaPorSeccion",
+    url:url+"/asignaturas/listAsignaturaEst",
     type:"POST",
-    data: JSON.stringify({"seccion_id": AuxPerfil.seccion}),
+    data: JSON.stringify({"perfil_id": AuxPerfil.id}),
     headers: {
         "Content-Type":"application/json",
     },
@@ -45,13 +48,12 @@ $.ajax({
         $("#formContent").html(text);
     }
 })
-
 function il(value){ 
     console.log(response[value]);
     var Aux=perfil.split(",");
     var sec=Aux[3].split("}");
     localStorage["asignatura"]=response[value].nombre;
-    localStorage["perfil"]= Aux[0]+","+Aux[1]+","+Aux[2]+","+sec[0]+',"asignatura":"'+response[value].id+'","nombre_asignatura":"'+response[value].nombre+'","seccion":"'+response[value].seccion_id+'"}';
+    localStorage["perfil"]= Aux[0]+","+Aux[1]+","+Aux[2]+","+Aux[3]+","+Aux[4]+","+sec[0]+',"asignatura":"'+response[value].id+'","nombre_asignatura":"'+response[value].nombre+'","seccion":"'+response[value].seccion_id+'"}';
     window.location.href="alumnos.html";
 }
 </script>
