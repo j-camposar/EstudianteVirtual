@@ -37,7 +37,7 @@
     * Create your own at http://cspisawesome.com
     -->
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
-    
+
     <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
     <link rel="stylesheet" type="text/css" href="lib/font-awesome/css/fontawesome.css"/>
     <link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -57,7 +57,7 @@
                     </ul>
                 </div>
                 <div class="">
-                   
+
                 </div>
             </div>
         </nav>
@@ -78,7 +78,7 @@
                         </div>
                         <div class="col-sm-12 col-md-9">
                             <div class="rightab">
-                               
+
                                 <div class="tab-content" id="tabla" name="tabla">
                                         </div>
                                     </div>
@@ -115,8 +115,8 @@
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script type="text/javascript" src="js/system.js"></script>
 <script type="text/javascript">
-      var url='https://api.estudiantevirtual.cl';
-      //var url="http://api.dev.estudiantevirtual.cl";
+  var url='https://api.dev.estudiantevirtual.cl';
+    //var url="http://localhost:8080/api_estudiantevirtual";
     var Preguntas;
     var list;
     var aux;
@@ -134,7 +134,7 @@
     }else{
         perfil=localStorage["perfil"];
         aux =JSON.parse(perfil);
-      $("#header").load("header2.html");
+      $("#header").load("head3.html");
         document.getElementById("name").innerHTML = localStorage["asignatura"];
         document.getElementById("rut").innerHTML =  aux.rut;
     }
@@ -145,77 +145,70 @@
     }
     var hora= hoy.getHours()+':'+hoy.getMinutes();
     $.ajax({
-        url: url+"/asignatura-pruebas/buscaDisp",
+        url: url+"/opciones/buscaOpTest",
         type: 'POST',
-        data:JSON.stringify({"prueba_id":localStorage["id_prueba"], "perfil_id":aux.id,"dia":hoy.getFullYear()+"-"+ mes+"-"+hoy.getDate()+" 00:00:00","hora":hora}),
+        data:JSON.stringify({"id_pruebas":localStorage["id_prueba"]}),
         headers: {
             "Content-Type":"application/json",
             },
-        success(resp){
-            if (resp!="error"){
-                $.ajax({
-                    url: url+"/opciones/buscaOpTest",
-                    type: 'POST',
-                    data:JSON.stringify({"id_pruebas":localStorage["id_prueba"]}),
-                    headers: {
-                        "Content-Type":"application/json",
-                        },
-                    success(Preguntas){
-                        console.log(localStorage["id_prueba"]);
-                        if(localStorage["time"]==-1){
-                            localStorage["time"] = Preguntas[0].minprueba +":00";
-                        }
-                        localStorage["preguntas"]=JSON.stringify(Preguntas);
-                        var menu='<ul class="verticalwiz">';
-                        var todo="";
-                        list=random_list(Preguntas.length);
-                        //console.log(list);
-                        for(var i=1; i<Preguntas.length+1;i++){
-                            largo=i-1;                   
-                            var dis;
-                            if(Preguntas[list[largo]].imagen==""){
-                                dis="none";
-                            }else{
-                                dis="inline-block";
-                            }
-                            todo=todo+ ('<div class="tab-pane active" name="tab'+i+'" id="tab'+i+'" ><br><h3><strong>Pregunta '+i+' - </strong><span id="p'+i+'" data-q="0" >'+Preguntas[list[largo]].pregunta+'</span>&nbsp&nbsp&nbsp<img id="imagen'+i+'" src="./img/'+Preguntas[list[largo]].imagen+'" style="width:200px; display:'+dis+'"/> </h3><div class="form-actions"><div class="row"><div class="col-sm-12"><div class="frb-group"></li>');
-                            for(var x=0;x<Preguntas[list[largo]]["op"].length;x++){
-                                todo=todo+'<div class="frb frb-primary"><input type="radio" id="r'+i+'-'+x+'" name="r'+i+'" value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
-                            }
-                            var adelante=i+1;
-                            var atras=i-1
-                            if (i==1){
-                                //menu//
-                                menu=menu+'<li class="active" data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" class="active"> <span class="step">'+i+'</span> <span class="title"></span> </a>';   
-                                //fin menu//
-                                todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous disabled"><a href="" class="btn btn-lg btn-default disabled" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
-                            }else if(i==Preguntas.length){
-                                menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';   
-                                todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a  onclick="finalizar();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Finalizar </a></li></ul> </div></div></div></div></div>';
-                            }else{
-                                menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';   
-                                todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
-                            }
-                        }
-                        menu = menu+'</ul>';
-                        $("#menu").html(menu);
-                        $("#tabla").html(todo);
-                        document.getElementById("test1").style.display="block";
-                        document.getElementById('timer').innerHTML =  localStorage["time"];
-                        startTimer();
+        success(Preguntas){
+            console.log(localStorage["id_prueba"]);
+            if(localStorage["time"]==-1){
+                localStorage["time"] = Preguntas[0].minprueba +":00";
+            }
+            localStorage["preguntas"]=JSON.stringify(Preguntas);
+            var menu='<ul class="verticalwiz">';
+            var todo="";
+            list=random_list(Preguntas.length);
+            //console.log(list);
+            for(var i=1; i<Preguntas.length+1;i++){
+                largo=i-1;
+                var dis;
+                var preg= "";
+                if (i==1){
+                    preg="active"
+                }
+                if(Preguntas[list[largo]].imagen==""){
+                    dis="none";
+                }else{
+                    dis="inline-block";
+                }
+                todo=todo+ ('<div class="tab-pane '+preg+'"  name="tab'+i+'" id="tab'+i+'" ><br><h3><strong>Pregunta '+i+' - </strong><span id="p'+i+'" data-q="0" >'+Preguntas[list[largo]].pregunta+'</span>&nbsp&nbsp&nbsp<img id="imagen'+i+'" src="./img/'+Preguntas[list[largo]].imagen+'" style="width:200px; display:'+dis+'"/> </h3><div class="form-actions"><div class="row"><div class="col-sm-12"><div class="frb-group"></li>');
+                 if(Preguntas[list[largo]].preguntas_tipo_id==1){
+                    for(var x=0;x<Preguntas[list[largo]]["op"].length;x++){
+                        todo=todo+'<div class="frb frb-primary"><input type="radio" id="r'+i+'-'+x+'" name="r'+i+'" value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
                     }
-                });
-            }else{
-                Swal.fire(
-                    title='¡Prueba ya realizada!',
-                    html='No se puede contestar mas de una vez esta prueba',
-                    type ='error'
-                ).then((result) => {
-                    window.location.href="listaPruebas.html";
-                });
-            } 
+                }else if(Preguntas[list[largo]].preguntas_tipo_id==3){
+                    // Verdaderos y falsos 
+                    todo=todo+'<div class="frb frb-primary"><input type="radio" id="r'+i+'-0" name="r'+i+'" value="V"><label for="r'+i+'-0"><span class="frb-title">V</span><span class="frb-description" id="p1">'+Preguntas[list[largo]]["op"][0].nombre+'</span></label></div>';
+                    todo=todo+'<div class="frb frb-primary"><input type="radio" id="r'+i+'-1" name="r'+i+'" value="F"><label for="r'+i+'-1"><span class="frb-title">F</span><span class="frb-description" id="p2">'+Preguntas[list[largo]]["op"][1].nombre+'</span></label></div>';
+                }else if(Preguntas[list[largo]].preguntas_tipo_id==2){
+                    todo=todo+'<div class="frb frb-primary"><textarea  id="r'+i+'" name="r'+i+'" ></textarea></div>';
+                }
+                var adelante=i+1;
+                var atras=i-1
+                if (i==1){
+                    //menu//
+                    menu=menu+'<li class="active" data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" class="active"> <span class="step">'+i+'</span> <span class="title"></span> </a>';
+                    //fin menu//
+                    todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous disabled"><a href="" class="btn btn-lg btn-default disabled" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
+                }else if(i==Preguntas.length){
+                    menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';
+                    todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a  onclick="finalizar();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Finalizar </a></li></ul> </div></div></div></div></div>';
+                }else{
+                    menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';
+                    todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
+                }
+            }
+            menu = menu+'</ul>';
+            $("#menu").html(menu);
+            $("#tabla").html(todo);
+            document.getElementById("test1").style.display="block";
+            document.getElementById('timer').innerHTML =  localStorage["time"];
+            startTimer();
         }
     });
+      
 });
 
 function finalizar(){
@@ -229,41 +222,62 @@ function finalizar(){
         confirmButtonText: 'Si, Finalizar',
         cancelButtonText: 'Modificar'
     }).then((result) => {
+        console.log(result);
         if (result.value) {
             var Pregunta=localStorage["preguntas"];
             var largo=JSON.parse(Pregunta);
-            var resps = {};
+            var resps = [];
+            var total=0;
             for (var i = 1; i <=largo.length ; i++) {
                 var respx = 0;
                 var larg=i-1
+                total+=largo[list[larg]].puntaje;
+                console.log(largo[list[larg]].preguntas_id);
+                resps[larg]={}
                 $('input[name="r'+i+'"]:checked').each(function () {
-                    resps["id_p" + i] =largo[list[larg]].preguntas_id;
-                    resps["resp" + i] = this.value;
-                    if(largo[list[larg]].correcta==resps["resp"+i]){
-                        resps["validacion"+i]=1;
+                    resps[larg]["id_p"] =largo[list[larg]].preguntas_id;
+                    resps[larg]["resp"] = this.value;
+                    resps[larg]["pruebas_id"] = localStorage["id_prueba"];
+                    resps[larg]["perfil_id"] = aux.id;
+                    if(largo[list[larg]].correcta==resps[larg]["resp"]){
+                        resps[larg]["validacion"]=largo[list[larg]].puntaje;
                     }else{
-                        resps["validacion"+i]=0;
+                        resps[larg]["validacion"]=0;
                     }
                     respx = 1;
                 });
                 if (respx==0) {
-                    resps["id_p" + i] =largo[list[larg]].preguntas_id;
-                    resps["resp" + i] = "x";
-                    resps["validacion"+i]=0;
+                    valor=$("#r"+i).val();
+                    console.log("#r"+i);
+                    if(valor!=undefined && valor!=""){
+                        resps[larg]["id_p"] =largo[list[larg]].preguntas_id;
+                        resps[larg]["resp"] = valor;
+                        resps[larg]["pruebas_id"] = localStorage["id_prueba"];
+                        resps[larg]["perfil_id"] = aux.id;
+                        if(largo[list[larg]].correcta==resps[larg]["resp"]){
+                            resps[larg]["validacion"]=largo[list[larg]].puntaje;
+                        }else{
+                            resps[larg]["validacion"]=0;
+                        }
+                    }else{
+                        resps[larg]["perfil_id"] = aux.id;
+                        resps[larg]["pruebas_id"] = localStorage["id_prueba"];
+                        resps[larg]["id_p"] =largo[list[larg]].preguntas_id;
+                        resps[larg]["resp"] = "x";
+                        resps[larg]["validacion"]=0;
+                    }
                 }
             }
-            //console.log(largo);
             var nota=0;
             for(var i=1;i<= largo.length;i++){
-                nota = nota+resps["validacion"+i];
+                nota = nota+resps[i-1]["validacion"];
             }
             // console.log(largo[0].pruebas.exigencia);
-            nota=not(nota,largo.length,largo[0].exigencia);
-            console.log(nota);
+            nota=not(nota,total,largo[0].exigencia);
             $.ajax({
                 url: url+"/respuestas/guardaNota",
                 type: 'POST',
-                data:JSON.stringify({"asignatura_pruebas_id":localStorage["asignatura_pruebas_id"],"perfil_id":aux.id, "nota":nota}),
+                data:JSON.stringify({"pruebas_id":localStorage["id_prueba"],"perfil_id":aux.id, "nota":nota}),
                 headers: {
                     "Content-Type":"application/json",
                     },
@@ -281,26 +295,25 @@ function finalizar(){
                 },
                 success(Preguntas){
                 //console.log(response);
-                    if(Preguntas=="ok"){
-                        Swal.fire(
-                                title='¡Prueba Terminada!',
-                                html='<h3>Su nota es: '+nota+'</h3>',
-                                type ='success'
-                        ).then((result) => {
-                            localStorage["realizado"]="true";
-                            localStorage["time"]=-1;
-                            window.location.href="listaPruebas.html";
-                        });
-                    }else{
-                        Swal.fire(
-                                title='¡Error!',
-                                html='Saque una foto y enviela a su profesor (error 0001)',
-                                type ='success'
-                        ).then((result) => {
-                            localStorage["realizado"]="true";
-                            window.location.href="listaPruebas.html";
-                        });
-                    }
+                    $.ajax({
+                        url: url+"/respuestas/guardaRespuestas",
+                        type: 'POST',
+                        data:JSON.stringify(resps),
+                        headers: {
+                            "Content-Type":"application/json",
+                            },
+                        success(Preguntas){
+                            Swal.fire(
+                                    title='¡Prueba Terminada!',
+                                    html='<h3>Su nota es: '+nota+'</h3>',
+                                    type ='success'
+                            ).then((result) => {
+                                localStorage["realizado"]="true";
+                                localStorage["time"]=-1;
+                                window.location.href="listaPruebas.html";
+                            });
+                        }
+                    });
                 }
             });
         }else{
@@ -409,7 +422,7 @@ function finalizaTiempo(){
         });
     }
     function startTimer() {
-       
+
         var presentTime = document.getElementById('timer').innerHTML;
         var timeArray = presentTime.split(/[:]+/);
         var m = timeArray[0];
@@ -445,15 +458,15 @@ function finalizaTiempo(){
         }
     }
     function random_list(largo){
-        var lis=[]; 
+        var lis=[];
         var cont =0;
       //console.log(largo);
        while (lis.length < largo){
             var num=Math.floor(Math.random()*largo);
             //console.log(lis.indexOf(num));
             if (lis.indexOf(num)==-1){
-                lis[cont]=num;  
-                cont++;            
+                lis[cont]=num;
+                cont++;
             }
         }
         return lis;
