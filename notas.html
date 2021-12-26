@@ -106,9 +106,26 @@
 <div class="app">
             <center>
                 <div id="formContentRepor" style="padding: 30px;" >
-                    <div >
-                        <h4>Agregar Notas</h4>
-                        <i class="fas fa-plus-circle" onclick='openForm()' style ='font-size:40px; margin-left:30px' ></i>
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <h4>Agregar Notas</h4>
+                            <i class="fas fa-plus-circle" onclick='openForm()' style ='font-size:40px; margin-left:30px' ></i>
+                        </div> 
+                        <div class="col-xl-4">
+                            <h4>Generar Excel</h4>
+                            <i class="fas fa-file-excel" onclick='excel()' style ='font-size:40px; margin-left:30px' ></i>
+                        </div> 
+                    </div>
+                    </br>
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <h4>Filtrar </h4>
+                            <select class="form-control" id="filtro">
+                                <option value="2" >Todos</option>
+                                <option value="0" >Inactivos</option>
+                                <option value="1" >Activos</option>
+                            </select>
+                        </div> 
                     </div> 
                     </br> </br>
                     <table id="customers">
@@ -122,15 +139,18 @@
             </br>
                 <input type="text" placeholder="Nombre" style ="width:100%" name="prueba"  id="prueba" required>
                 </br>
-                <label for="a">Seccion</label>
-                <select id ="seccion">
-                </select>
+                <label for="a">Curso</label>
+                <div id ="seccion"></div>
+                
             </br>
                 <label for="b"><b>Inicio de Evaluacion </b></label>
                 <input type="date" class="textarea" placeholder="Respuesta" name="ini" id="ini"  required>
             </br>
                 <label for="c"><b>Fin de Evaluacion</b></label>
                 <input type="date" class="textarea" placeholder="Respuesta" name="fin" id="fin" required>
+            </br>
+            <label for="c"><b>% Ponderacion</b></label>
+            <input type="number" class="textarea" placeholder="10%" name="ponderacion" id="ponderacion" required>
             </br>
                 <button type="button" id ="subir" class="btn">Subir</button>
                 <button type="button" class="btn cancel" onclick="closeForm()">Cancelar</button>
@@ -157,23 +177,18 @@
 <script src="lib/bootstrap-fileinput-master/js/fileinput.min.js" type="text/javascript"></script>
 <script src="lib/bootstrap-fileinput-master/js/locales/es.js" type="text/javascript"></script>	
 <script>
-       var url='https://api.estudiantevirtual.cl';
-       //var url="http://api.dev.estudiantevirtual.cl";
-   $(function(){
+        // var url='https://api.dev.estudiantevirtual.cl';
+       var url="http://localhost:8080/api_estudiantevirtual";
+       $(function () {
         if(AuxPerfil.type==2){
-            $("#header").load("head3.html");
-            $(".btn-get").hide();
-            setTimeout(() => {
-                console.log(AuxPerfil);
-                $("#perfil").html(AuxPerfil.nombre);
-            }, 1000);
+            $("#header").load("head1.html");
         }else{
             $("#header").load("head.html");
-            $(".btn-get").hide();
-            setTimeout(() => {
-                $("#perfil").html(AuxPerfil.nombre);
-            }, 1000);
         }
+        $(".btn-get").hide();
+        setTimeout(() => {
+            $("#perfil").html(AuxPerfil.nombre);
+        }, 1000);
     });
     if(localStorage["perfil"]==null){
         window.location.href="index.html";
@@ -183,97 +198,91 @@
     }
     var PerfilGlobal;
     var PruebaGlobal;
-    $.ajax({
-        url: url+'/respuestas/listaPruebasH',
-        type: 'POST',
-        data: JSON.stringify({"seccion_id":AuxPerfil.seccion_id, "asignatura_id": AuxPerfil.asignatura_id}),
-        headers: {
-            "Content-Type": "application/json"
-        },
-        success: function(Auxresponse){
-            var text= "<tr><td>Nombre</td><td>rut</td>";
+    ini();
+    function ini(filtro=2){
+        $.ajax({
+            url: url+'/respuestas/listaPruebasH',
+            type: 'POST',
+            data: JSON.stringify({"seccion_id":AuxPerfil.seccion_id, "asignatura_id": AuxPerfil.asignatura_id, "filtro":filtro}),
+            headers: {
+                "Content-Type": "application/json"
+            },
+            success: function(Auxresponse){
+                var text= "<tr><td>Nombre</td><td>rut</td>";
+                for (var i =0;i<(Auxresponse["prueba"].length-1);i++){
+                    var fe=Auxresponse["prueba"][i].ini.split("T");
+                    fe=fe[0].split("-");
+                    text=text+"<td>"+Auxresponse["prueba"][i].nombre_prueba+" / "+fe[2]+"-"+fe[1]+"-"+fe[0]+"  <i id='editar_"+i+"'  onclick='des("+i+","+Auxresponse["est"].length+")' name='editar"+i+"'  class='fas fa-pencil-alt' style ='text-align:center;' ></i><i id ='check"+i+"' onclick='guardar("+i+","+Auxresponse["est"].length+","+Auxresponse["prueba"][i].id_prueba+")' class='fas fa-check' style='display:none'></i></td>";
+                }
+                text=text+"<td>Promedio</td>";
 
-            console.log(Auxresponse);
-            for (var i =0;i<Auxresponse["prueba"].length;i++){
-                var fe=Auxresponse["prueba"][i].ini.split(" ");
-                fe=fe[0].split("-");
-                text=text+"<td>"+Auxresponse["prueba"][i].nombre_prueba+" / "+fe[2]+"-"+fe[1]+"-"+fe[0]+"  <i id='editar_"+i+"'  onclick='des("+i+","+Auxresponse["est"].length+")' name='editar"+i+"'  class='fas fa-pencil-alt' style ='text-align:center;' ></i><i id ='check"+i+"' onclick='guardar("+i+","+Auxresponse["est"].length+","+Auxresponse["prueba"][i].id_prueba+")' class='fas fa-check' style='display:none'></i></td>";
-            }
-            text=text+"</tr>";
-            var con=0;
-            var ver=0;
-            console.log(Auxresponse["est"].length);
-            PerfilGlobal=Auxresponse["est"];
-            PruebaGlobal=Auxresponse["prueba"];
-            for (var i =0;i<Auxresponse["est"].length;i++){
-                console.log(Auxresponse["est"]);
-                text=text+"<tr><td>"+Auxresponse["est"][i].apellido+" "+Auxresponse["est"][i].nombre+ "</td><td>"+Auxresponse["est"][i].rut+ "</td>";
-                for (var x =0;x<Auxresponse["prueba"].length;x++){
-                    if (Auxresponse["est"][i].nota!=null){
-                        if (Auxresponse["est"][i].nota[Auxresponse["prueba"][x]["aspr"]]==null || Auxresponse["est"][i].nota[Auxresponse["prueba"][x]["aspr"]]["val"]==0){
-                            text=text+"<td><input type='text' style='width:100px;' id='"+x+"_"+i+"' value='' disabled/ ></td></td>";
+                text=text+"</tr>";
+                var con=0;
+                var ver=0;
+                PerfilGlobal=Auxresponse["est"];
+                PruebaGlobal=Auxresponse["prueba"];
+                for (var i =0;i<Auxresponse["est"].length;i++){
+                    if(Auxresponse["est"][i]["estado"]==1){
+                        text=text+"<tr><td>"+Auxresponse["est"][i].apellido+" "+Auxresponse["est"][i].nombre+ "</td><td>"+Auxresponse["est"][i].rut+ "</td>";
+                    }else{
+                        text=text+"<tr><td><del>"+Auxresponse["est"][i].apellido+" "+Auxresponse["est"][i].nombre+ "</del></td><td><del>"+Auxresponse["est"][i].rut+ "</del></td>";
+                    }
+                    for (var x =0;x<Auxresponse["prueba"].length;x++){
+                        if (Auxresponse["est"][i].nota!=null){
+                            if (Auxresponse["est"][i].nota[Auxresponse["prueba"][x]["aspr"]]==null || Auxresponse["est"][i].nota[Auxresponse["prueba"][x]["aspr"]]["val"]==0){
+                                text=text+"<td><input type='text' style='width:100px;' id='"+x+"_"+i+"' value='' disabled/ ></td></td>";
+                            }else{
+                                text=text+"<td><input type='text' style='width:100px;' id='"+x+"_"+i+"' value='"+Auxresponse["est"][i].nota[Auxresponse["prueba"][x]["aspr"]]["val"]+"' disabled/></td></td>";
+                            }
                         }else{
-                            console.log(Auxresponse["est"][i].nota[Auxresponse["prueba"][x]["aspr"]]["val"]);
-                            text=text+"<td><input type='text' style='width:100px;' id='"+x+"_"+i+"' value='"+Auxresponse["est"][i].nota[Auxresponse["prueba"][x]["aspr"]]["val"]+"' disabled/></td></td>";
+                            text=text+"<td><input type='text' style='width:100px;' id='"+x+"_"+i+"' value='' disabled/ ></td></td>";
                         }
                     }
+                    text=text+"</tr>";
                 }
-                text=text+"</tr>";
-            }
-            $("#customers").html(text);
-        }
-    })
-    function openForm() {
-        document.getElementById("myForm").style.display = "block";
-        $.ajax({
-            url:url+"/asignatura/listAsignatura",
-            type:"POST",
-            data: JSON.stringify({"perfil_id": AuxPerfil.id}),
-            headers: {
-                "Content-Type":"application/json",
-            },
-            success: function(respo){
-                response=respo;
-                var text='<select id="seccion" style="width:45%">';
-                for (var i =0;i< response.length;i++){
-                    text=text+'<option value="'+response[i].id+'">'+response[i].nombre+'</option>';
-                    text=text+'</select>';
-                }
-                document.getElementById("seccion").innerHTML=text;
+                $("#customers").html(text);
             }
         })
     }
-function closeForm() {
-    document.getElementById("prueba").value="";
-    document.getElementById("myForm").style.display = "none";
-}
+    $("#filtro").change(function(){
+        val=$("#filtro").val();
+        ini(val);
+    })
+    function excel(){
+        window.open(url+"/respuestas/listaPruebasH/1/"+AuxPerfil.seccion_id+"/"+AuxPerfil.asignatura_id);
+    }
+    function openForm() {
+        document.getElementById("myForm").style.display = "block";
+        document.getElementById("seccion").innerHTML="<label>"+AuxPerfil.seccion_nom+"</label>";
+    }
+    function closeForm() {
+        document.getElementById("myForm").style.display = "none";
+    }
 var num=0;
 
-
 $(document).on('click', '#subir', function (e) {
-    if(document.getElementById("prueba").value!="" && document.getElementById("ini").value!="" && document.getElementById("fin").value!=""){
-        var sec= $("#seccion").val();
-        var seccion = JSON.parse(sec);
+    if(document.getElementById("ponderacion").value!=0 &&document.getElementById("prueba").value!="" && document.getElementById("ini").value!="" && document.getElementById("fin").value!=""){
+        var sec= AuxPerfil.seccion_nom;
         data=JSON.stringify({
             "prueba":{
                 "id":0,
                 "nombre":document.getElementById("prueba").value,
-                "ini":document.getElementById("ini").value +" 00:00:00",
-                "fin":document.getElementById("fin").value+" 00:00:00",
-                "horafin":"00:00:00",
-                "horaini":"00:00:00",
-                "minprueba":0,
-                "exigencia":0
+                "ponderacion":document.getElementById("ponderacion").value
             },
             "aspr":{
-                "asignatura_id":AuxPerfil.asignatura_id,
-                "seccion_id":AuxPerfil.seccion_id,
-                "estado":1
+                "prueba":0,
+                "secciones_id":AuxPerfil.seccion_id,
+                "estados_id":1,
+                "inicio_prueba":document.getElementById("ini").value,
+                "fin_prueba":document.getElementById("fin").value,
+                "hora_fin":"00:00:00",
+                "hora_inicio":"00:00:00",
+                "duracion":0,
+                "exigencia":0,
             }
         });
-        console.log(data);   
         $.ajax({
-            url: url+'/asignatura-pruebas/guardaPrueba',
+            url: url+'/pruebas-por-secciones/guardaPrueba',
             type: 'POST',
             data:data,
             headers: {
@@ -292,27 +301,35 @@ $(document).on('click', '#subir', function (e) {
                 })
             },
             success: function(repos){
-                Swal.fire({
-                    title: "Listo!",
-                    text: "Prueba Guardada Correctamente",
-                    type: 'success',
-                }).then(function (result){
-                  // window.location.reload();
-                })
+                if(repos["estado"]==true){
+                    Swal.fire({
+                        title: "Listo!",
+                        text: "Prueba Guardada Correctamente",
+                        type: 'success',
+                    }).then(function (result){
+                        ini();
+                        document.getElementById("myForm").style.display = "none";
+                    })
+                }else if(repos["estado"]==false){
+                    Swal.fire({
+                        title: "Error!",
+                        text: repos["mensaje"],
+                        type: 'error',
+                    })
+                }
             }
         });
     }else{
         Swal.fire({
-                title: "Error!",
-                text: "Por favor rellene todos los campos",
-                type: 'error',
+            title: "Error!",
+            text: "Por favor rellene todos los campos",
+            type: 'error',
         });
     }
 });
 function des(valor,max){
     for (var i =0; i<max;i++){
         $('input[id="'+valor+"_"+i+'"]').each(function () {
-
             document.getElementById(valor+"_"+i).disabled=false;
         });
     }
@@ -331,50 +348,57 @@ function guardar(posPrueba,cantEst, idPrueba){
         cancelButtonText: 'No, seguir editando'
     }).then((result) => {
         if (result.value) {
-            Swal.fire({
-            title: 'Enviando datos',
-            html: 'Por favor espere.',
-            timer: 100000,
-            timerProgressBar: true,
-            onBeforeOpen: () => {
-                Swal.showLoading()
-                timerInterval = setInterval(() => { 100})
-            },
-            onClose: () => {
-                clearInterval(timerInterval)
+            var text="[";
+            for (var i =0; i<cantEst;i++){
+                console.log(PruebaGlobal);
+                $('input[id="'+posPrueba+"_"+i+'"]').each(function () {
+                    if(document.getElementById(posPrueba+"_"+i).value!=""){
+                        text=text+'{"pruebas_id":"'+PruebaGlobal[posPrueba].id_prueba+'","calificacion":"'+document.getElementById(posPrueba+"_"+i).value+'","perfil_id":'+PerfilGlobal[i].id+'},';
+                    }
+                });
             }
-        });
-        var text="[";
-        for (var i =0; i<cantEst;i++){
-            console.log(PruebaGlobal);
-            $('input[id="'+posPrueba+"_"+i+'"]').each(function () {
-                if(document.getElementById(posPrueba+"_"+i).value!=""){
-                    text=text+'{"asignatura_pruebas_id":"'+PruebaGlobal[posPrueba].aspr+'","nota":"'+document.getElementById(posPrueba+"_"+i).value+'","perfil_id":'+PerfilGlobal[i].id+'},';
-                }
-            });
-        }
-        text=text.slice(0,-1);
-        text=text+"]";
-        console.log(text);
-        console.log(JSON.parse(text));
-        $.ajax({
-            url: url+'/Respuestas/multi-update',
-            type: 'POST',
-            data: text,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            success: function(repos){
-                console.log(repos);
-                if(repos=="ok"){
+            text=text.slice(0,-1);
+            text=text+"]";
+            $.ajax({
+                url: url+'/Respuestas/multi-update',
+                type: 'POST',
+                data: text,
+                headers: {
+                    "Content-Type": "application/json"
+                },beforeSend: function(){
                     Swal.fire({
-                        title: "Listo!",
-                        text: "Datos  Guardados Correctamente",
-                        type: 'success',
-                    }).then(function (result){
-                        window.location.reload();
-                        document.getElementById("editar"+pos).style.display="inline-block";
-                        document.getElementById("check"+pos).style.display="none";
+                        title: 'Enviando datos',
+                        html: 'Por favor espere.',
+                        timer: 100000,
+                        timerProgressBar: true,
+                        onBeforeOpen: () => {
+                            Swal.showLoading()
+                            timerInterval = setInterval(() => { 100})
+                        },
+                        onClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                    });
+                },            
+                success: function(repos){
+                    console.log(repos);
+                    if(repos["estado"]==true){
+                        Swal.fire({
+                            title: "Listo!",
+                            text: "Datos  Guardados Correctamente",
+                            type: 'success',
+                        }).then(function (result){
+                            window.location.reload();
+                            document.getElementById("editar"+pos).style.display="inline-block";
+                            document.getElementById("check"+pos).style.display="none";
+                        })
+                    }else{
+                        Swal.fire({
+                            title: "Error!",
+                            text: repos["mensaje"],
+                            type: 'error',
+                        }).then(function (result){
+                            window.location.reload();
                         })
                     }
                 }
