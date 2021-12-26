@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+    <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css" />
+    <link rel="stylesheet" type="text/css" href="lib/font-awesome/css/fontawesome.css"/>
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <title>Hello World</title>
+</head>
+<body style="background-image:none !important">
+    <div id="header"></div>
+    <div class="app">
+        <nav class="navbar infobar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <span class="infobar-title">Prueba </span>
+                    <ul class="infobar-info">
+                        <li><a>Asignatura: <span name="name" id="name"></span></a></li>
+                        <li><a>Rut: <span name="rut" id="rut"></span></a></li>
+                    </ul>
+                </div>
+                <div class="">
+
+                </div>
+            </div>
+        </nav>
+<div class="container" id="test1" style="display: none " >
+    <div class="row">
+        <article style="margin-top: 5em;">
+            <div class="widget-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="col-sm-12 col-md-3">
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <div class="vrtwiz" id="menu">
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-9">
+                            <div class="rightab">
+
+                                <div class="tab-content" id="tabla" name="tabla">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+</div>
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
+<script type="text/javascript" src="lib/font-awesome/jS/all.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script type="text/javascript" src="js/system.js"></script>
+<script type="text/javascript">
+     var url='https://api.dev.estudiantevirtual.cl';
+    //var url="http://localhost:8080/api_estudiantevirtual";
+    var Preguntas;
+    var list;
+    var aux;
+    $(function(){
+        $("#header").load("head3.html");
+    if(localStorage["perfil"]===null){
+        window.location.href="index.html";
+    }else{
+        perfil=localStorage["perfil"];
+        aux =JSON.parse(perfil);
+        document.getElementById("name").innerHTML = localStorage["asignatura"];
+        document.getElementById("rut").innerHTML =  aux.rut;
+    }
+    var hoy=new Date();
+    var mes =parseInt(hoy.getMonth())+1;
+    if (mes<10){
+        mes="0"+mes;
+    }
+    var hora= hoy.getHours()+':'+hoy.getMinutes();
+    $.ajax({
+        url: url+"/opciones/buscaOpTestRes",
+        type: 'POST',
+        data:JSON.stringify({"id_pruebas":localStorage["id_prueba"],"perfil_id":aux.id,}),
+        headers: {
+            "Content-Type":"application/json",
+            },
+        success(Preguntas){
+            console.log(Preguntas);
+            localStorage["preguntas"]=JSON.stringify(Preguntas);
+            var menu='<ul class="verticalwiz">';
+            var todo="";
+            list=random_list(Preguntas.length);
+            //console.log(list);
+            for(var i=1; i<Preguntas.length+1;i++){
+                largo=i-1;
+                var dis;
+                var preg= "";
+                if (i==1){
+                    preg="active"
+                }
+                if(Preguntas[list[largo]].imagen==""){
+                    dis="none";
+                }else{
+                    dis="inline-block";
+                }
+                var color;
+               
+                todo=todo+ ('<div class="tab-pane '+preg+'"  name="tab'+i+'" id="tab'+i+'" ><br><h3><strong>Pregunta '+i+' - </strong><span id="p'+i+'" data-q="0" >'+Preguntas[list[largo]].pregunta+'</span>&nbsp&nbsp&nbsp<img id="imagen'+i+'" src="./img/'+Preguntas[list[largo]].imagen+'" style="width:200px; display:'+dis+'"/> </h3><div class="form-actions"><div class="row"><div class="col-sm-12"><div class="frb-group"></li>');
+                 if(Preguntas[list[largo]].preguntas_tipo_id==1){
+                    for(var x=0;x<Preguntas[list[largo]]["op"].length;x++){
+                        if(Preguntas[list[largo]].puntaje!=0 && Preguntas[list[largo]].respuesta==Preguntas[list[largo]]["op"][x].opciones){
+                            color="background: green;"
+                            check="checked";
+                            todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'"  value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
+                        }else if(Preguntas[list[largo]].puntaje==0){
+                            if(Preguntas[list[largo]]["op"][x].opciones==Preguntas[list[largo]].respuesta){
+                                color="background: red;"
+                                check="checked";
+                                todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'"  value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
+                            }else if(Preguntas[list[largo]]["op"][x].opciones==Preguntas[list[largo]].correcta){
+                                color="background: yellow;"
+                                check="";
+                                todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'"  value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
+                            }else{
+                                check="";
+                                color="";
+                                todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'"  value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
+                            }
+                        }else{
+                            check="";
+                            color="";
+                            todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'"  value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description" id="p'+x+Preguntas[list[largo]]["op"][x].opciones+'">'+Preguntas[list[largo]]["op"][x].nombre+'</span></label></div>';
+                        }
+                    }
+                }else if(Preguntas[list[largo]].preguntas_tipo_id==3){
+                    // Verdaderos y falsos 
+                    for(var x=0;x<Preguntas[list[largo]]["op"].length;x++){
+                        if(Preguntas[list[largo]].puntaje!=0 && Preguntas[list[largo]].respuesta==Preguntas[list[largo]]["op"][x].opciones){
+                            color="background: green;"
+                            check="checked";
+                            todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'" value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description">'+Preguntas[list[largo]]["op"][0].nombre+'</span></label></div>';
+                        }else if(Preguntas[list[largo]].puntaje==0){
+                            if(Preguntas[list[largo]]["op"][x].opciones==Preguntas[list[largo]].respuesta){
+                                color="background: red;"
+                                check="checked";
+                                todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'" value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description">'+Preguntas[list[largo]]["op"][0].nombre+'</span></label></div>';
+                            }else{
+                                color="background: yellow;"
+                                check="";
+                                todo=todo+'<div class="frb frb-primary"><input '+check+' type="radio" id="r'+i+'-'+x+'" name="r'+i+'" value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'" for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description">'+Preguntas[list[largo]]["op"][0].nombre+'</span></label></div>';
+                            }
+                        }
+                        else{
+                            check="";
+                            color="";
+                            todo=todo+'<div class="frb frb-primary"><input type="radio" id="r'+i+'-'+x+'" name="r'+i+'" value="'+Preguntas[list[largo]]["op"][x].opciones+'"><label style="'+color+'"  for="r'+i+'-'+x+'"><span class="frb-title">'+Preguntas[list[largo]]["op"][x].opciones+'</span><span class="frb-description">'+Preguntas[list[largo]]["op"][1].nombre+'</span></label></div>';
+                        }
+                    }
+                }else if(Preguntas[list[largo]].preguntas_tipo_id==2){
+                    if(Preguntas[list[largo]].puntaje!=0 && Preguntas[list[largo]].respuesta==Preguntas[list[largo]].correcta){
+                        color="background: green;"
+                        todo=todo+'<div class="frb frb-primary"><textarea  style="'+color+'" id="r'+i+'" name="r'+i+'" >'+Preguntas[list[largo]].respuesta+'</textarea></div>';
+                        todo=todo+'<div class="frb frb-primary"><textarea  id="r'+i+'" name="r'+i+'" >'+Preguntas[list[largo]].respuesta+'</textarea></div>';
+                    }else{
+                        color="background: green;"
+                        todo=todo+'<div class="frb frb-primary"><textarea  style="background: red" id="r'+i+'" name="r'+i+'" >'+Preguntas[list[largo]].respuesta+'</textarea></div>';
+                        todo=todo+'<div class="frb frb-primary"><textarea   style="background: yellow" id="r'+i+'" name="r'+i+'" >'+Preguntas[list[largo]].correcta+'</textarea></div>';
+                    }
+                }
+                var adelante=i+1;
+                var atras=i-1
+                if (i==1){
+                    //menu//
+                    menu=menu+'<li class="active" data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" class="active"> <span class="step">'+i+'</span> <span class="title"></span> </a>';
+                    //fin menu//
+                    todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous disabled"><a href="" class="btn btn-lg btn-default disabled" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
+               
+                }else if(i==Preguntas.length){
+                    menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';
+                    todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a  onclick="finalizar();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Volver </a></li></ul> </div></div></div></div></div>';
+                }else{
+                    menu=menu+'<li  data-target="#step'+i+'"><a id="t'+i+'" href="#tab'+i+'" data-toggle="tab" > <span class="step">'+i+'</span> <span class="title"></span> </a>';
+                    todo=todo+'</div><div class="col-sm-12"><ul class="pager wizard no-margin"><li class="previous"><a href="" class="btn btn-lg btn-default" onclick="$(\'#t'+atras+'\').click();" data-toggle="tab"> Anterior </a></li><li class="next"><a href="" onclick="$(\'#t'+adelante+'\').click();" class="btn btn-lg txt-color-darken" data-toggle="tab"> Siguiente </a></li></ul> </div></div></div></div></div>';
+                }
+            }
+            menu = menu+'</ul>';
+            $("#menu").html(menu);
+            $("#tabla").html(todo);
+            document.getElementById("test1").style.display="block";
+        }
+    });
+});
+
+function finalizar(){
+    window.location.href="listaPruebas.html";
+}
+
+    function not(nota, total,exigencia){
+        console.log(nota,total,exigencia);
+        if (nota<(total*(exigencia/100))){
+            var nota2= 20*(nota/((exigencia/100)*total))+20;
+            console.log(nota2);
+            return Math.round(nota2);
+        }else{
+            nota2=30*((nota-((exigencia/100)*total))/(total*(1-(exigencia/100))))+40;
+            console.log(nota2);
+            return Math.round(nota2);
+        }
+    }
+    function random_list(largo){
+        var lis=[];
+        var cont =0;
+      //console.log(largo);
+       while (lis.length < largo){
+            var num=Math.floor(Math.random()*largo);
+            //console.log(lis.indexOf(num));
+            if (lis.indexOf(num)==-1){
+                lis[cont]=num;
+                cont++;
+            }
+        }
+        return lis;
+    }
+    $(document).bind( 'mobileinit', function(){
+                         $.mobile.loader.prototype.options.text = "loading";
+                         $.mobile.loader.prototype.options.textVisible = true;
+                         $.mobile.loader.prototype.options.theme = "p";
+                         $.mobile.loader.prototype.options.textonly = false;
+                         $.mobile.loader.prototype.options.html = "<span class='ui-bar ui-overlay-c ui-corner-all'><i class='fa fa-spinner fa-spin fa-5x' style='color:#000;'></i></span>";
+                         });
+</script>
+</body>
+
+</html>
