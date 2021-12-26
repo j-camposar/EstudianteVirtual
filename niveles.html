@@ -9,8 +9,6 @@
 
 <link rel="stylesheet" type="text/css" href="lib/datatables/css/dataTables.bootstrap.min.css" />
 <body>
-    <div id="header"></div>
-
 <div class="wrapper fadeInDown">
     <div id="formContent">
         
@@ -23,8 +21,8 @@
 <script type="text/javascript" src="lib/datatables/js/jquery.dataTables.js"></script>
 <script type="text/javascript" src="lib/datatables/dataTables.bootstrap.min.js"></script>
 <script>
-      var url='https://api.estudiantevirtual.cl';
-    //var url="http://api.dev.estudiantevirtual.cl";
+// var url='https://api.dev.estudiantevirtual.cl';
+var url="http://localhost:8080/api_estudiantevirtual";
     $(function () {
             $(".btn-get").hide();
         });
@@ -34,10 +32,10 @@
         perfil=localStorage["perfil"];
         var AuxPerfil=JSON.parse(perfil);
     }
-    var text="</br>";
+    var text="<div style='font-size:20px'>Seleccione la Seccion con la que trabajara</div></br>";
     var response;
 $.ajax({
-    url:url+"/asignatura/listAsignatura",
+    url:url+"/asignaturas/listAsignatura",
     type:"POST",
     data: JSON.stringify({"perfil_id": AuxPerfil.id}),
     headers: {

@@ -123,8 +123,8 @@
 <script src="lib/bootstrap-fileinput-master/js/fileinput.min.js" type="text/javascript"></script>
 <script src="lib/bootstrap-fileinput-master/js/locales/es.js" type="text/javascript"></script>	
 <script>
-     var url='https://api.estudiantevirtual.cl';
-     //var url="http://api.dev.estudiantevirtual.cl";
+          var url='https://api.dev.estudiantevirtual.cl';
+        //var url="http://localhost:8080/api_estudiantevirtual";
    $(function(){
       $("#header").load("head2.html");
     });
@@ -139,7 +139,7 @@
                 }, 1000);
     var pruebas;
     $.ajax({
-        url:url+"/asignatura-pruebas/listarPruebaAlumnos",
+        url:url+"/pruebas-por-secciones/listarPruebaAlumnos",
         type:"POST",
         data: JSON.stringify({"seccion_id":AuxPerfil.seccion, "asignatura_id": AuxPerfil.asignatura, "perfil_id":AuxPerfil.id}),
         headers: {
@@ -227,45 +227,75 @@ $(document).on('click', '#ingresar', function (e) {
         fech=fech+"-"+dia +" "+hora+":"+minuto+":"+segundo;
     }
     var aux=valores.split("~");
-    for(var i =0;i<pruebas.length;i++){
-        if(aux[0]==pruebas[i].id_prueba){
-            localStorage["id_prueba"]=pruebas[i].id_prueba;
-            localStorage["asignatura_pruebas_id"]=pruebas[i].id_aspr;
-            $.ajax({
-                url:url+"/ControlPruebas/VerificaPruebas",
-                type:"POST",
-                data: JSON.stringify({"id":0,"pruebas_id":pruebas[i].id_prueba,"perfil_id":AuxPerfil.id, "fecha":fech}),
-                headers: {
-                    "Content-Type":"application/json",
-                },beforeSend: function(){
-                    Swal.fire({
-                        title: 'Iniciando Prueba',
-                        html: 'Por favor espere.',
-                        timer: 10000,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                            Swal.showLoading()
-                            timerInterval = setInterval(() => 100)
-                        }
-                    })
-                },success: function(response) {
-                    if (response==1){
-                        window.location.href="test.html";
-                    }else if (response==2){
-                        Swal.fire(
-                        "Error",
-                        "No puede ingresar nuevamente a esta prueba",
-                        "error");
-                    }else{
-                        Swal.fire(
-                        "Error",
-                        "No puede ingresar nuevamente a esta prueba",
-                        "error")
+        for(var i =0;i<pruebas.length;i++){
+            if(aux[0]==pruebas[i].id_prueba){
+                localStorage["id_prueba"]=pruebas[i].id_prueba;
+                localStorage["asignatura_pruebas_id"]=pruebas[i].id_aspr;
+                if(aux[9]!=0 ){
+                    window.location.href="respuestas.html";
+                    localStorage["id_prueba"]=pruebas[i].id_prueba;
+                    localStorage["asignatura_pruebas_id"]=pruebas[i].id_aspr;
+                }else{
+                    var hoy=new Date();
+                    var mes =parseInt(hoy.getMonth())+1;
+                    if (mes<10){
+                        mes="0"+mes;
                     }
+                    var hora= hoy.getHours()+':'+hoy.getMinutes();
+                    $.ajax({
+                        url: url+"/pruebas-por-secciones/buscaDisp",
+                        type: 'POST',
+                        data:JSON.stringify({"prueba_id":localStorage["id_prueba"], "perfil_id":AuxPerfil.id,"dia":hoy.getDate()+"-"+ mes+"-"+(hoy.getFullYear().toString().substr(-2)),"hora":hora}),
+                        headers: {
+                            "Content-Type":"application/json",
+                    },beforeSend: function(){
+                            Swal.fire({
+                                title: 'Iniciando Prueba',
+                                html: 'Por favor espere.',
+                                timer: 10000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    timerInterval = setInterval(() => 100)
+                                }
+                            })
+                        },success: function(resp) {
+                            if(resp!="error"){
+                                $.ajax({
+                                    url:url+"/pruebas-por-secciones/VerificaPruebas",
+                                    type:"POST",
+                                    data: JSON.stringify({"id":0,"pruebas_id":localStorage["id_prueba"],"perfil_id":AuxPerfil.id, "fecha":fech}),
+                                    headers: {
+                                        "Content-Type":"application/json",
+                                    },
+                                    success(response){
+                                        if (response==1){
+                                            window.location.href="test.html";
+                                        }else if (response==2){
+                                            Swal.fire(
+                                            "Error",
+                                            "Prueba no disponible",
+                                            "error");
+                                        }else{
+                                            Swal.fire(
+                                            "Error",
+                                            "Prueba no disponible",
+                                            "error");
+                                        }
+                                    }
+                                });
+                            }else{
+                                Swal.fire(
+                                        "Error",
+                                        "Prueba no disponible",
+                                        "error");
+                            }
+                        }
+                    }); 
+                    
                 }
-            }); 
-        }
-    }   
+            }
+        }   
 });
 
 </script>
