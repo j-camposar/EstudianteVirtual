@@ -119,22 +119,17 @@
     </div>
     <div class="form-popup" id="myForm">
         <form  class="form-container">
-            <label for="Pregunta"><b>Nombre Evento</b></label>
-        </br>
-            <input type="text" placeholder="Nombre" style ="width:100%" name="nombre"  id="nombre" required>
-        </br>
             <label for="Pregunta"><b>Asunto</b></label>
         </br>
             <input type="text" placeholder="Asunto" style ="width:100%" name="asunto"  id="asunto" required>
         </br>
         <label for="Pregunta"><b>Detalle</b></label>
         </br>
-            <textarea class="form-control" placeholder="Detalle" style ="width:100%" name="asunto"  id="asunto" required></textarea>
+            <textarea class="form-control" placeholder="Detalle" style ="width:100%" name="detalle"  id="detalle" required></textarea>
     
         </br>
             <label for="a">Curso</label>
-            <select id ="seccion">
-            </select>
+            <label id ="seccion"></label>
         </br>
             <label for="b"><b>Inicio de Evento </b></label>
             <input type="date" class="textarea" placeholder="Respuesta" name="ini" id="ini"  required>
@@ -143,10 +138,10 @@
             <input type="date" class="textarea" placeholder="Respuesta" name="fin" id="fin" required>
         </br>
         <label for="c"><b>Link de reunion</b></label>
-        <input type="text" class="textarea" placeholder=" " name="fin" id="fin" required>
+        <input type="text" class="textarea" placeholder=" " name="link" id="link" required>
         </br>
             <button type="button" id ="subir" class="btn">Subir</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Borrar</button>
+            <button type="button" class="btn cancel" onclick="borrar()">Borrar</button>
             <button type="button" class="btn warning" onclick="closeForm()">Cancelar</button>
         </form>
     </div>    
@@ -157,8 +152,8 @@
 <script type="text/javascript" src="lib/font-awesome/js/fontawesome.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
-     var url='https://api.dev.estudiantevirtual.cl';
-        //var url="http://localhost:8080/api_estudiantevirtual";
+     // var url='https://api.dev.estudiantevirtual.cl';
+     var url="http://localhost/api_estudiantevirtual_back";
      if(localStorage["perfil"]==null){
         window.location.href="index.html";
     }else{
@@ -166,84 +161,199 @@
         console.log(perfil);
         var AuxPerfil=JSON.parse(perfil);
     }
-        $("#header").load("head.html");
+    if(AuxPerfil.type==2){
+                $("#header").load("head1.html");
+            }else{
+                $("#header").load("head.html");
+            }
         $(".btn-get").hide();
         setTimeout(() => {
             $("#perfil").html(AuxPerfil.nombre);
         }, 1000);
-     function openForm() {
+     function openForm(info) {
         document.getElementById("myForm").style.display = "block";
-        $.ajax({
-            url:url+"/asignatura/listAsignatura",
-            type:"POST",
-            data: JSON.stringify({"perfil_id": AuxPerfil.id}),
-            headers: {
-                "Content-Type":"application/json",
-            },
-            success: function(respo){
-                response=respo;
-                var text='<select id="seccion" style="width:45%">';
-                for (var i =0;i< response.length;i++){
-                    text=text+'<option value="'+response[i].id+'">'+response[i].nombre+'</option>';
-                    text=text+'</select>';
-                }
-                document.getElementById("seccion").innerHTML=text;
-            }
-        })
+        var text='<label>'+AuxPerfil.seccion_nom+'</label>';
+        fin=info.endStr.split("-");
+        dia=(fin[2]-1);
+        if(dia<10){
+            dia="0"+dia;
+        }
+        console.log(dia);
+        $("#fin").val(fin[0]+"-"+fin[1]+"-"+dia);
+        $("#ini").val(info.startStr);
+        document.getElementById("seccion").innerHTML=text;
     }
-    $("#seccion").change(function(){
+    function openForm2(info) {
+        console.log(dias);
+        document.getElementById("myForm").style.display = "block";
+        var text='<label>'+AuxPerfil.seccion_nom+'</label>';
+        for(var i=0;i<dias.length; i++){
+            if(info.event._def.publicId==dias[i]["id"]){
+                fin=dias[i]["end"].split("-");
+                dia=(fin[2]-1);
+                ini=dias[i]["start"].split(" ");
+                if(dia<10){
+                    dia="0"+dia;
+                }
+                console.log(dia);
+                ids=dias[i]["id"];
+                $("#fin").val(fin[0]+"-"+fin[1]+"-"+dia);
+                $("#ini").val(ini[0]);
+                $("#asunto").val(dias[i]["title"]);
+                $("#detalle").val(dias[i]["detalle"]);
+                $("#link").val(dias[i]["link"]);
+            }
+        }
+        document.getElementById("seccion").innerHTML=text;
+    }
+    console.log(AuxPerfil);
+    var dias;
+    var calendarEl = document.getElementById('calendar');
+    document.addEventListener('DOMContentLoaded', function() {
         $.ajax({
-            url:url+"/asignatura/listAsignatura",
-            type:"POST",
-            data: JSON.stringify({"seccion_id": $("#seccion").val()}),
+            url: url+"/eventos/listEvento",
+            type: 'POST',
+            data:JSON.stringify({"perfil_id":AuxPerfil.id}),
             headers: {
                 "Content-Type":"application/json",
-            },
-            success: function(respo){
-                response=respo;
-                var text='<select id="estudiantes" style="width:45%">';
-                for (var i =0;i< response.length;i++){
-                    text=text+'<option value="'+response[i].id+'">'+response[i].nombre+'</option>';
-                    text=text+'</select>';
-                }
-                document.getElementById("estudiantes").innerHTML=text;
+                },
+            beforeSend: function(){
+                Swal.fire({
+                    title: 'Cargando Evento!',
+                    html: 'Por favor espere.',
+                    timer: 10000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => 100)
+                    }
+                })
+            },success: function(data){
+                console.log(data);
+                dias=data;
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                selectable: true,
+                selectMirror:true,
+                navLinks: true,
+                editable: true,
+                aspectRatio: 3,
+                    headerToolbar: {
+                        left: 'dayGridMonth,timeGridWeek,timeGridDay',
+                        center: 'title',
+                        right: 'prev,next today'
+                    },
+                    events: data,
+                    locale: 'es',
+                    select: function(info) {
+                        console.log(info);
+                        openForm(info);
+                        // change the day's background color just for fun
+                    },eventClick: function(info) {
+                        console.log(info);
+                        openForm2(info);
+
+                    }
+                });
+                calendar.render();
+                Swal.fire(
+                    "Listo",
+                    "calendario Cargado",
+                    "success"
+                )
             }
-        })
-    });
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          selectable: true,
-          selectMirror:true,
-          navLinks: true,
-          editable: false,
-          aspectRatio: 3,
-            headerToolbar: {
-                left: 'dayGridMonth,timeGridWeek,timeGridDay',
-                center: 'title',
-                right: 'prev,next today'
+        });
+    })
+    function borrar() {   
+        $.ajax({
+            url: url+"/eventos/borrarEvento",
+            type: 'post',
+            data: JSON.stringify({"id":ids }),
+            headers: {
+                "Content-Type": "application/json"
+            }, beforeSend: function(){
+                Swal.fire({
+                    title: 'Subiendo Evento!',
+                    html: 'Por favor espere.',
+                    timer: 10000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => 100)
+                    }
+                })
+            },success: function(data){
+                Swal.fire(
+                    "Listo",
+                    "Elementos eliminados",
+                    "success"
+                ).then(function (result){
+                    window.location.reload();
+                });
             },
-            events: [
-                { // this object will be "parsed" into an Event Object
-                title: 'Evento n°2', // a property!
-                start: '2021-11-17', // a property!
-                end: '2021-11-18' // a property! ** see important note below about 'end' **
-                }
-            ],
-            locale: 'es',
-            dateClick: function(info) {
-                console.log(info);
-                openForm();
-                // change the day's background color just for fun
-            },select: function(info2){
-                console.log(info2);
-                openForm();
-            }
-            });
-        calendar.render();
-    });
+        });
+    }
     function closeForm() {
         document.getElementById("myForm").style.display = "none";
+
+     
     }
+    var ids=0;
+    $(document).on('click', '#subir', function (e) {
+        if($("#asunto").val()!=""&& $("#detalle").val()!=""){
+            data=JSON.stringify({
+                "id":ids,
+                "asunto":$("#asunto").val(),
+                "detalle":$("#detalle").val(),
+                "fin": $("#fin").val(),
+                "inicio": $("#ini").val(),
+                "link": $("#link").val(),
+                "perfil_id":AuxPerfil.id,
+                "estado":1,
+                "secciones_id":AuxPerfil.seccion_id
+            });
+            $.ajax({
+                url: url+"/eventos/saveEvento",
+                type: 'post',
+                data:data,
+                headers: {
+                    "Content-Type": "application/json"
+                }, beforeSend: function(){
+                    Swal.fire({
+                        title: 'Subiendo Evento!',
+                        html: 'Por favor espere.',
+                        timer: 10000,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            timerInterval = setInterval(() => 100)
+                        }
+                    })
+                },success: function(data){
+                    if(data["estado"]==true){
+                        Swal.fire(
+                            "Listo",
+                            data["texto"],
+                            "success"
+                        ).then(function (result){
+                            window.location.reload();
+                        });  
+                    }else{
+                        Swal.fire(
+                            "Error",
+                            data["texto"],
+                            "error"
+                        );
+                    }
+                    
+                }
+            })
+        }else{
+            Swal.fire(
+                "Error",
+                "Rellene el asunto y el detalle del evento",
+                "error"
+            );
+        }
+    });
     </script>
